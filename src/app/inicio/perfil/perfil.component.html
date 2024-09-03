@@ -1,0 +1,20 @@
+<vex-secondary-toolbar current="Dashboard">
+    <vex-breadcrumbs [crumbs]="['Dashboards']" class="flex-auto"></vex-breadcrumbs>
+
+    <button class="ml-2" color="primary" mat-icon-button type="button">
+        <mat-icon [icIcon]="icMoreVert"></mat-icon>
+    </button>
+</vex-secondary-toolbar>
+<div [@stagger]="true" class="p-gutter" vexContainer>
+
+    <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px">
+        <div @fadeInUp fxFlex="auto">
+            <div class="px-6 py-4 border-b" fxLayout="row" fxLayoutAlign="start center">
+                <h2 class="title m-0">Basic Forms</h2>
+            </div>
+        </div>
+    </div>
+
+    <router-outlet></router-outlet>
+
+</div>

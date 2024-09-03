@@ -1,0 +1,165 @@
+@import "~simplebar/dist/simplebar.css";
+@import "~highlight.js/styles/androidstudio.css";
+// Vex Core
+@import "./@vex/styles/core";
+
+/*
+  You can override any CSS Variable or style here
+  Example:
+
+  :root {
+   --sidenav-background: #333333;
+  }
+
+  All possible variables can be found in @vex/styles/core or by simply inspecting the element you want to change
+  in Chrome/Firefox DevTools
+*/
+
+/**
+  Uncomment the below code and adjust the values to fit your colors, the application will automatically adjust
+ */
+:root {
+  .w-18 {
+    width: 6rem;
+  }
+  // --color-primary: blue;
+  // --color-primary-contrast: white;
+
+  // --color-accent: yellow;
+  // --color-accent-contrast: black;
+
+  // --color-warn: yellow;
+  // --color-warn-contrast: black;
+
+  /*.bg-primary {
+    background-color: var(--color-secundary);
+  }
+
+  .item-icon {
+    color: var(--sidenav-item-icon-color);
+  }
+
+  .mat-raised-button.mat-primary {
+    color: var(--color-primary-bg);
+  }
+
+  .dropdown-header {
+    background-color: var(--toolbar-color-bar) !important;
+  }
+  
+  .toolbar .mat-raised-button.mat-primary {
+    background-color: var(--color-primary-bg);
+    color: var(--color-primary-contrast);
+  }
+
+  .sidenav-toolbar {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 200px;
+    width: 100%;
+    flex-direction: column;
+    flex: 1 200px;
+  }
+
+  .sidenav-toolbar img{
+    display:block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }*/
+
+  //DIALOG
+  .mat-toolbar-multiple-rows {
+    min-height: 40px !important;
+  }
+
+  .mat-toolbar-row {
+    height: 40px !important;
+  }
+
+  /*.mat-dialog-title {
+    font-size: 14px !important;
+    margin-bottom: 0px !important;
+  }*/
+
+  .title-dialog {
+    font-size: 15px !important;
+    font-weight: bold !important;
+  }
+
+  .mat-dialog-title {
+    padding: 8px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .mat-dialog-content {
+      //padding: 10px !important;
+      //margin: 0px !important;
+      margin: 0 14px !important;
+      padding: 0 14px !important;
+      max-height: 65vh !important;
+      overflow: auto !important;
+
+  }
+
+  .mat-dialog-actions {
+      padding: 30px !important;
+  }
+
+  .mat-dialog-container {
+    max-width: none !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    display: block;
+    /*padding: 24px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    overflow: auto;
+    outline: 0;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    max-height: inherit;*/
+  }
+
+  //SPINNER BUTTON
+  @keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
+  }
+
+  .spinner:before {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    border-top-color: #000000;
+    animation: spinner .8s linear infinite;
+  }
+
+  .mat-progress-spinner {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ic-inline {
+    padding-top: 8px;
+  }
+
+
+}

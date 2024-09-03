@@ -1,0 +1,446 @@
+<vex-secondary-toolbar current="{{itemPrincipal}}" *ngIf="accesoFormulario">
+    <vex-breadcrumbs [crumbs]="['Compras / Gestión de Compra']" class="flex-auto"></vex-breadcrumbs>
+    <button class="ml-2" color="primary" mat-icon-button type="button">
+        <mat-icon [icIcon]="icMoreVert"></mat-icon>
+    </button>
+</vex-secondary-toolbar>
+<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="!accesoFormulario" class="py-40">
+    <div @fadeInUp fxFlex="auto">
+        <blockquote *ngIf="validandoPermiso"
+            style="margin: 0px; background-color: #e3e3e3; color: #575757; text-align: center;">
+            Verificando este módulo. Un momento por favor ...
+        </blockquote>
+        <blockquote *ngIf="!validandoPermiso"
+            style="margin: 0px; background-color: #e3e3e3; color: #575757; text-align: center;">
+            Ud. no tiene permisos para acceder a este módulo.
+        </blockquote>
+    </div>
+</div>
+
+<vex-page-layout *ngIf="accesoFormulario">
+    <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+    <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+        [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+        <div class="card overflow-auto -mt-16">
+
+            <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+                <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+                    <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                        <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <!--@fadeInRight-->
+                    <span class="block">{{tituloForm}}</span>
+                </h2>
+                <span fxFlex></span>
+            </div>
+
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="accesoFormulario">
+
+                <div class="card" fxFlex="auto" *ngIf="loadingCompras">
+                    <div class="spinner-container">
+                        <br /><br />
+                        <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                        <br /><br />
+                    </div>
+                </div>
+
+                <div class="card" fxFlex="auto" *ngIf="!loadingCompras" [formGroup]="formCompra">
+                    <!--<mat-tab-group [selectedIndex]="0">
+                        <mat-tab label="Información de la Compra" [formGroup]="formCompra">-->
+
+                    <blockquote class="blockquoteAzul">Información general de la Orden de Compra.</blockquote>
+                    <div fxLayout="column" class="margenesForms">
+                        <div class="px-2 py-2" fxLayout="column">
+                            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                                <mat-form-field fxFlex="30">
+                                    <mat-label>Fecha de Compra</mat-label>
+                                    <input matInput [matDatepicker]="pickerfechaIni" formControlName="fechacompra"
+                                        (dateChange)="validaFechas()" readonly required [disabled]="deshabilitaItems">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerfechaIni">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #pickerfechaIni></mat-datepicker>
+                                    <mat-error *ngIf="formCompra.get('fechacompra').hasError('required')">
+                                        Seleccione la fecha de compra</mat-error>
+                                </mat-form-field>
+                                <mat-form-field fxFlex="30">
+                                    <mat-label>Fecha de Entrega</mat-label>
+                                    <input matInput [matDatepicker]="pickerfechaFin" formControlName="fechaentrega"
+                                        (dateChange)="verificarCompra()" [min]="minFecha" readonly required [disabled]="deshabilitaItems">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerfechaFin">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #pickerfechaFin></mat-datepicker>
+                                    <mat-error *ngIf="formCompra.get('fechaentrega').hasError('required')">
+                                        Seleccione la fecha de entrega</mat-error>
+                                </mat-form-field>
+                                <mat-form-field fxFlex="30">
+                                    <mat-label>Proveedor</mat-label>
+                                    <mat-select formControlName="proveedor" required
+                                        (selectionChange)="verificarCompra()" [class.spinner]="habilitaCboProveed"
+                                        [disabled]="habilitaCboProveed || deshabilitaItems">
+                                        <mat-option [value]="0">Seleccione una opcion</mat-option>
+                                        <mat-option *ngFor="let option of lstProveedor" [value]="option.idproveedor">
+                                            {{option.representante}}
+                                            | {{option.ruc}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-hint align="start">Seleccione una opción</mat-hint>
+                                    <mat-error *ngIf="formCompra.get('proveedor').hasError('required')">
+                                        Seleccione una opción</mat-error>
+                                </mat-form-field>
+                                <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab
+                                    matTooltip="Registrar Proveedor" type="button" *ngIf="!deshabilitaItems">
+                                    <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(2)"></mat-icon>
+                                </button>
+                            </div>
+                            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                                <mat-form-field fxFlex="50">
+                                    <mat-label>Recibir en:</mat-label>
+                                    <mat-select formControlName="recibe" required [class.spinner]="habilitaCboTienda"
+                                        [disabled]="habilitaCboTienda || deshabilitaItems" (selectionChange)="verificarCompra()">
+                                        <mat-option [value]="0">Seleccione una opcion</mat-option>
+                                        <mat-option *ngFor="let option of lstTienda" [value]="option.idtienda">
+                                            {{option.tipotienda}}: {{option.nombre}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-hint align="start">Seleccione una opción</mat-hint>
+                                    <mat-error *ngIf="formCompra.get('recibe').hasError('required')">Seleccione
+                                        una opción</mat-error>
+                                </mat-form-field>
+                                <mat-form-field fxFlex="50">
+                                    <mat-label>Tipo de Documento:</mat-label>
+                                    <mat-select formControlName="tipoemision" required [class.spinner]="habilitaCboTEmision"
+                                        [disabled]="habilitaCboTEmision || deshabilitaItems" (selectionChange)="verificarCompra()">
+                                        <mat-option [value]="0">Seleccione un tipo de documento</mat-option>
+                                        <mat-option *ngFor="let option of lstTipoEmision" [value]="option.idcatalogodetalle">
+                                            {{option.descripcion}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-hint align="start">Seleccione una opción</mat-hint>
+                                    <mat-error *ngIf="formCompra.get('recibe').hasError('required')">Seleccione
+                                        una opción</mat-error>
+                                </mat-form-field>
+                                <mat-form-field fxFlex="50">
+                                    <mat-label>Nro Documento</mat-label>
+                                    <input formControlName="nrodocumento" matInput maxlength="255" minlength="3"
+                                        required [disabled]="deshabilitaItems">
+                                    <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                                    <mat-hint align="start">Ingrese el número de documento</mat-hint>
+                                    <mat-error *ngIf="formCompra.get('nrodocumento').hasError('required')">Ingrese el número de documento</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                                <mat-form-field fxFlex="100">
+                                    <mat-label>Referencia</mat-label>
+                                    <input formControlName="referencia" matInput maxlength="255" minlength="3"
+                                        required [disabled]="deshabilitaItems">
+                                    <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                                    <mat-hint align="start">Ingrese una referencia</mat-hint>
+                                    <mat-error *ngIf="formCompra.get('referencia').hasError('required')">Ingrese los
+                                        datos de la referencia</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+
+                    <mat-tab-group [selectedIndex]="0">
+                        <mat-tab label="Búsqueda de Productos" *ngIf="!deshabilitaItems">
+                            <!--BUSQUEDA DE PRODUCTOS-->
+                            <div *ngIf="idCompra && !deshabilitaItems" style="margin-top: 20px!important;">
+                                <blockquote class="blockquoteVerde">Búsqueda de Productos: Realice la búsqueda de los productos
+                                    .</blockquote>
+                                <div fxLayout="column" class="margenesForms">
+                                    <div class="px-2 py-2" fxLayout="column">
+                                        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                                            <mat-form-field fxFlex="100">
+                                                <mat-label>Buscar Producto ...</mat-label>
+                                                <input formControlName="producto" matInput maxlength="255" minlength="3"
+                                                    (keypress)="keyPress($event)">
+                                                <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                                            </mat-form-field>
+                                            <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab
+                                                matTooltip="Buscar Producto" type="button">
+                                                <mat-icon [icIcon]="icSearch" (click)="buscarProducto()"></mat-icon>
+                                            </button>
+                                            <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab
+                                                matTooltip="Agregar Producto" type="button">
+                                                <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(2)"></mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="spinner-container" *ngIf="loadingProductos">
+                                    <mat-progress-spinner [diameter]="50" mode="indeterminate" color="accent">
+                                    </mat-progress-spinner>
+                                    <br />
+                                </div>
+                                <table [dataSource]="dataSource" class="w-full mat-table-main" mat-table matSort
+                                    *ngIf="!loadingProductos">
+                                    <ng-container matColumnDef="correlativo">
+                                        <th mat-header-cell *matHeaderCellDef width="5%">#</th>
+                                        <td mat-cell *matCellDef="let element; let i = index">
+                                            {{ i + 1 }}-
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="producto">
+                                        <th mat-header-cell *matHeaderCellDef width="20%">Producto</th>
+                                        <td mat-cell *matCellDef="let element;">
+                                            {{ element.nombreProducto }}<br>
+                                            Cod. Producto: {{element.idproducto}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="umedida">
+                                        <th mat-header-cell *matHeaderCellDef width="10%">U. Medida</th>
+                                        <td mat-cell *matCellDef="let element;">
+                                            {{ element.unidadmedida }}<br>
+                                            Cant:<b>{{element.cantidad}}</b>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="proveedor">
+                                        <th mat-header-cell *matHeaderCellDef width="15%">Proveedor</th>
+                                        <td mat-cell *matCellDef="let element;">
+                                            {{ element.representanteProveedor }}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="marca">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">Marca</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right">
+                                            {{ element.marca}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="pcostoHist">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">P. Costo Hist.</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right">
+                                            {{ element.pcostohistorico | currency: " S/."}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="pcosto">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">P. Costo</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right">
+                                            {{ element.preciocosto | currency: " S/."}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="pventa">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">P. Venta</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right">
+                                            {{ element.preciounitario | currency: " S/."}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="stock">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">Stock</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right">
+                                            {{ element.cantidadunidad}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="accion">
+                                        <th mat-header-cell *matHeaderCellDef width="10%">Acción</th>
+                                        <td mat-cell *matCellDef="let element; let i = index">
+                                            <div class="accionBtn">
+                                                <button class="mr-4 my-2" fxFlex="none" mat-mini-fab
+                                                    matTooltip="Asignación rápida" type="button" (click)="agregarProducto(element)"
+                                                    [disabled]="habilitaBtnListProd" [class.spinner]="spinBtnListProd">
+                                                    <mat-icon [icIcon]="icAdd"></mat-icon>
+                                                </button>
+                                                <button class="mr-4 my-2" fxFlex="none" mat-mini-fab
+                                                    matTooltip="Agregar Montos" type="button" (click)="agregarMontos(element,1)">
+                                                    <mat-icon>shopping_cart</mat-icon>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+                                    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                                    <tr *matRowDef="let row; columns: displayedColumns;" @fadeInUp
+                                        class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                                </table>
+                                <div *ngIf="dataSource?.data?.length===0" class="no-records">
+                                    <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                                        <div class="mt-0 mb-0 text-secondary">No existen información registrada en este momento.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Productos Agregados">
+                            <!--PRODUCTOS AGREGADOS-->
+                            <div *ngIf="idCompra" style="margin-top: 20px!important;">
+                                <blockquote class="blockquoteNegro">Productos agregados</blockquote>
+                                <div class="spinner-container" *ngIf="loadingProductosAgregados">
+                                    <mat-progress-spinner [diameter]="50" mode="indeterminate" color="accent">
+                                    </mat-progress-spinner>
+                                    <br />
+                                </div>
+                                <table [dataSource]="dataSourceAgregados" class="w-full mat-table-main" mat-table matSort
+                                    *ngIf="!loadingProductosAgregados">
+                                    <ng-container matColumnDef="correlativo">
+                                        <th mat-header-cell *matHeaderCellDef width="5%">#</th>
+                                        <td mat-cell *matCellDef="let element; let i = index">
+                                            {{ i + 1 }}-
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="producto">
+                                        <th mat-header-cell *matHeaderCellDef width="20%">Producto</th>
+                                        <td mat-cell *matCellDef="let element;">
+                                            {{ element.nombreProducto }}<br>
+                                            Cod. Producto: {{element.idproducto}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="umedida">
+                                        <th mat-header-cell *matHeaderCellDef width="10%">U. Medida</th>
+                                        <td mat-cell *matCellDef="let element;">
+                                            {{ element.unidadmedida }}<br>
+                                            Cant:<b>{{element.stock}}</b>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="proveedor">
+                                        <th mat-header-cell *matHeaderCellDef width="15%">Proveedor</th>
+                                        <td mat-cell *matCellDef="let element;">
+                                            {{ element.representante }}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="marca">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">Marca</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right">
+                                            {{ element.marca}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="pcostoHist">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">P. Costo Hist.</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right">
+                                            {{ element.pcostohistorico | currency: " S/."}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="pventa">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">P. Costo</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right compra-agregada">
+                                            {{ element.preciocosto | currency: " S/."}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="cantidad">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">Cantidad</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right compra-agregada">
+                                            {{ element.cantidad}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="total">
+                                        <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">Total</th>
+                                        <td mat-cell *matCellDef="let element;" class="text-right compra-agregada">
+                                            {{ element.total | currency: " S/."}}
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="accion">
+                                        <th mat-header-cell *matHeaderCellDef width="10%">Acción</th>
+                                        <td mat-cell *matCellDef="let element; let i = index">
+                                            <div class="accionBtn">
+                                                <button color="primary" fxHide.xs [disabled]="habilitaBtnReg"
+                                                    [class.spinner]="spinBtnReg" matTooltip="Modificar Montos" 
+                                                    style="margin-right: 6px;" (click)="agregarMontos(element,2)" mat-mini-fab
+                                                    type="button" *ngIf="!deshabilitaItems" >
+                                                    <mat-icon>shopping_cart</mat-icon>
+                                                </button>
+                                                <button class="bg-botones-secundario" fxHide.xs [disabled]="habilitaBtnReg"
+                                                    [class.spinner]="spinBtnReg" matTooltip="Eliminar Producto"
+                                                    style="margin-right: 6px;" (click)="eliminarDetalle(element)" mat-mini-fab
+                                                    type="button" *ngIf="!deshabilitaItems">
+                                                    <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+                                    <tr *matHeaderRowDef="displayedColumnsAgregados" mat-header-row></tr>
+                                    <tr *matRowDef="let row; columns: displayedColumnsAgregados;" @fadeInUp
+                                        class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                                </table>
+                                <div *ngIf="dataSourceAgregados?.data?.length===0" class="no-records">
+                                    <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                                        <div class="mt-0 mb-0 text-secondary">No existen información registrada en este momento.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Montos Totales-->
+                            <div *ngIf="idCompra">
+                                <div fxLayout="column" class="margenesForms" style="margin-top: 20px!important;">
+                                    <div class="px-2 py-2" fxLayout="column">
+                                        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                                            <div fxFlex="30"></div>
+                                            <div fxFlex="30">
+                                                <div class="px-4 py-4" fxLayout="row" fxLayoutAlign="center center"
+                                                    fxLayoutGap="8px">
+                                                    <button color="dark" mat-raised-button type="button"
+                                                        (click)="Cancelar()">
+                                                        <mat-icon [icIcon]="icReturn" matPrefix></mat-icon>
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                                <div class="px-4 py-4" fxLayout="row" fxLayoutAlign="center center"
+                                                    fxLayoutGap="8px">
+                                                    <button color="primary" mat-raised-button type="button"
+                                                        [disabled]="habilitaBtnReg || deshabilitaItems" [class.spinner]="spinBtnReg"
+                                                        (click)="RegistrarCompra()">
+                                                        <mat-icon>save</mat-icon>
+                                                        Guardar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div fxFlex="40">
+                                                
+                                                <table style="width: 100%">
+                                                    <tr>
+                                                        <th>Total de Compra</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div fxLayout="row" fxLayoutAlign="center center">
+                                                                <mat-checkbox formControlName="incluyeIGV" class="caption" *ngIf="(tipoAccion == 2) && (!deshabilitaItems)"
+                                                                (change)="detectaMonto($event);">Incluye IGV</mat-checkbox>
+                                                                <mat-checkbox formControlName="incluyeIGV" class="caption" *ngIf="deshabilitaItems" [disabled]="true">Incluye IGV</mat-checkbox>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <mat-form-field fxFlex="100">
+                                                                <mat-label>Monto</mat-label>
+                                                                <input formControlName="monto" class="pcompras" matInput
+                                                                    maxlength="255" minlength="3" readonly>
+                                                                <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                                                            </mat-form-field>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <mat-form-field fxFlex="100">
+                                                                <mat-label>I.G.V.</mat-label>
+                                                                <input formControlName="igv" class="pcompras" matInput
+                                                                    maxlength="255" minlength="3" readonly>
+                                                                <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                                                            </mat-form-field>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <mat-form-field fxFlex="100">
+                                                                <mat-label>Monto Total</mat-label>
+                                                                <input formControlName="total" class="pcompras" matInput
+                                                                    maxlength="255" minlength="3" readonly>
+                                                                <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                                                            </mat-form-field>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tab>
+                    </mat-tab-group>
+
+                </div>
+
+            </div>
+
+        </div>
+    </vex-page-layout-content>
+</vex-page-layout>

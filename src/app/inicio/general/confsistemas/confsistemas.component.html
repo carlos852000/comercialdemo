@@ -1,0 +1,316 @@
+<vex-secondary-toolbar current="{{itemPrincipal}}" *ngIf="accesoFormulario">
+    <vex-breadcrumbs [crumbs]="['General']" class="flex-auto"></vex-breadcrumbs>
+    <button class="ml-2" color="primary" mat-icon-button type="button">
+        <mat-icon [icIcon]="icMoreVert"></mat-icon>
+    </button>
+</vex-secondary-toolbar>
+
+<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="!accesoFormulario" class="py-40">
+    <div @fadeInUp fxFlex="auto">
+        <blockquote *ngIf="validandoPermiso"
+            style="margin: 0px; color: #4d4d4d; text-align: center;">
+            Verificando este módulo. Un momento por favor ...
+            <div class="spinner-container" *ngIf="validandoPermiso">
+                <br />
+                <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                <br />
+            </div>
+        </blockquote>
+        <blockquote *ngIf="!validandoPermiso"
+            style="margin: 0px; color: #4d4d4d; text-align: center;">
+            Ud. no tiene permisos para acceder a este módulo.
+        </blockquote>
+    </div>
+</div>
+
+<vex-page-layout *ngIf="accesoFormulario">
+    <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+    <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+        [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+        <div class="card overflow-auto -mt-16">
+            <!--TITULO SISTEMA-->
+            <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+                <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+                    <span @scaleIn
+                        class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                        <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <span @fadeInRight class="block">Configuración del Sistema</span>
+                </h2>
+                <span fxFlex></span>
+            </div>
+            <!--TITULO SISTEMA-->
+
+            <mat-tab-group [selectedIndex]="0">
+                <mat-tab label="Información de la Empresa" [formGroup]="form01">
+
+                    <div fxLayout="column" class="margenesForms">
+                        <div class="flex flex-col sm:flex-row">
+                            <mat-form-field class="mt-6 flex-auto">
+                                <mat-label>Empresa</mat-label>
+                                <input matInput maxlength="250" class="uppercase"
+                                    formControlName="empresa" required>
+                                <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                                <mat-hint align="start">Ingrese los datos de la empresa</mat-hint>
+                                <mat-error *ngIf="form01.get('empresa').hasError('required')">Ingrese los datos de la empresa</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col sm:flex-row">
+                            <mat-form-field class="mt-6 flex-auto">
+                                <mat-label>Dirección</mat-label>
+                                <input matInput maxlength="250" class="uppercase"
+                                    formControlName="direccion" required>
+                                <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                                <mat-hint align="start">Ingrese una dirección</mat-hint>
+                                <mat-error *ngIf="form01.get('direccion').hasError('required')">Ingrese una dirección</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col sm:flex-row">
+                            <mat-form-field class="mt-6 flex-auto">
+                                <mat-label>RUC</mat-label>
+                                <input matInput maxlength="12" class="uppercase"  vexDirectivasComercial [entrada]='tipoEntradaNumero'
+                                    formControlName="ruc" required>
+                                <mat-icon [icIcon]="icNum" matPrefix></mat-icon>
+                                <mat-hint align="start">Ingrese el número de RUC</mat-hint>
+                                <mat-error *ngIf="form01.get('ruc').hasError('required')">Ingrese el número de RUC</mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+                                <mat-label>Teléfono</mat-label>
+                                <input matInput maxlength="10" class="uppercase"  vexDirectivasComercial [entrada]='tipoEntradaNumero'
+                                    formControlName="telefono" required>
+                                <mat-icon [icIcon]="icPhone" matPrefix></mat-icon>
+                                <mat-hint align="start">Ingrese un número de teléfono</mat-hint>
+                                <mat-error *ngIf="form01.get('telefono').hasError('required')">Ingrese un número de teléfono</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col sm:flex-row">
+                            <mat-form-field class="mt-6 flex-auto">
+                                <mat-label>IGV</mat-label>
+                                <input matInput maxlength="5" class="uppercase" vexDirectivasComercial [entrada]='tipoEntradaMoneda'
+                                    formControlName="igv" required>
+                                <mat-icon [icIcon]="icNum" matPrefix></mat-icon>
+                                <mat-hint align="start">Ingrese el monto de IGV</mat-hint>
+                                <mat-error *ngIf="form01.get('igv').hasError('required')">Ingrese el monto de IGV</mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+                                <mat-label>Valor Dolar</mat-label>
+                                <input matInput maxlength="5" class="uppercase" vexDirectivasComercial [entrada]='tipoEntradaMoneda'
+                                    formControlName="valdolar" required>
+                                <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                                <mat-hint align="start">Ingrese el monto del dolar</mat-hint>
+                                <mat-error *ngIf="form01.get('valdolar').hasError('required')">Ingrese el monto del dolar</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex flex-col sm:flex-row mt-6">
+                            <div fxFlex="50">
+                                <mat-label>Permite Facturación Electrónica:</mat-label>
+                                <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="facelectronica">
+                                    <mat-radio-button value="1">SI</mat-radio-button>
+                                    <mat-radio-button value="0">NO</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                        <!--<button class="mat-focus-indicator mat-button mat-button-base mat-dialogNO" 
+                            mat-raised-button type="button">Cancelar
+                        </button>-->
+                        <button mat-raised-button
+                            class="bg-botones-principal" *ngIf="btnRegistro"
+                            [disabled]="habilitaBtnReg" [class.spinner]="spinBtnReg"
+                            style="margin-right: 6px;" (click)="registrarParte01()"
+                            matTooltip="Registrar Información">
+                            <mat-icon>save</mat-icon>
+                            Registrar
+                        </button>
+                    </div>
+
+                </mat-tab>
+                <mat-tab label="Configuración General del Sistema" [formGroup]="form02">
+                    <div class="mt-2 ml-6 border-b" fxLayout="row" fxLayoutAlign="start center">
+                        <h4 class="subtitle m-0">Configuración del Sistema:</h4>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div fxLayout="column" class="margenesForms">
+                        <div fxLayout="column" fxLayoutGap="8px">
+                            <div fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                                <mat-form-field fxFlex="50">
+                                    <mat-label>Rubro:</mat-label>
+                                    <mat-select formControlName="rubro">
+                                        <mat-option *ngFor="let option of lstRubros" [value]="option.idrubro">{{option.descripcion}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-hint align="start">Seleccione un Rubro</mat-hint>
+                                    <mat-error *ngIf="form02.get('rubro').hasError('required')">Seleccione un Rubro</mat-error>
+                                </mat-form-field>
+                                <div fxFlex="50">
+                                    <mat-label>Generar código interno:</mat-label>
+                                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="generacodigointerno">
+                                        <mat-radio-button value="1">SI</mat-radio-button>
+                                        <mat-radio-button value="0">NO</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                            <div class="mt-2" fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                                <mat-form-field fxFlex="50">
+                                    <mat-label>Días considerados como novedad:</mat-label>
+                                    <mat-select formControlName="diasNovedad">
+                                        <mat-option *ngFor="let option of lstNumero" [value]="option.id">{{option.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-hint align="start">Seleccione una Opción</mat-hint>
+                                    <mat-error *ngIf="form02.get('diasNovedad').hasError('required')">Seleccione una Opción</mat-error>
+                                </mat-form-field>
+                                <div fxFlex="50">
+                                    <mat-label>Permitir Descuentos en Ventas:</mat-label>
+                                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="permitirDctosVentas">
+                                        <mat-radio-button value="1">SI</mat-radio-button>
+                                        <mat-radio-button value="0">NO</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                            <div class="mt-3" fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                                <div fxFlex="50">
+                                    <mat-label>Gestionar Precios por Tienda:</mat-label>
+                                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="gestionarPrecioTienda">
+                                        <mat-radio-button value="1">SI</mat-radio-button>
+                                        <mat-radio-button value="0">NO</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                                <div fxFlex="50">
+                                    <mat-label>Gestionar Precios por Grupos:</mat-label>
+                                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="gestionarPrecioGrupo">
+                                        <mat-radio-button value="1">SI</mat-radio-button>
+                                        <mat-radio-button value="0">NO</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                            <div class="mt-3" fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                                <div fxFlex="50">
+                                    <mat-label>Gestionar Stock:</mat-label>
+                                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="gestionarStock">
+                                        <mat-radio-button value="1">SI</mat-radio-button>
+                                        <mat-radio-button value="0">NO</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                                <div fxFlex="50">
+                                    <mat-label>Enviar correo al cliente:</mat-label>
+                                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="enviarCorreoCliente">
+                                        <mat-radio-button value="1">SI</mat-radio-button>
+                                        <mat-radio-button value="0">NO</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                            <div class="mt-3" fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                                <div fxFlex="50">
+                                    <mat-label>Desagregar productos:</mat-label>
+                                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="desagregarProductos">
+                                        <mat-radio-button value="1">SI</mat-radio-button>
+                                        <mat-radio-button value="0">NO</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 ml-6 border-b" fxLayout="row" fxLayoutAlign="start center">
+                        <h4 class="subtitle m-0">Filtros de Búsqueda: </h4>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div fxLayout="column" class="margenesForms">
+                        <div fxLayout="column" fxLayoutGap="8px">
+                            <div fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                                <mat-form-field fxFlex="50">
+                                    <mat-label>Mostar n° Productos para Ventas:</mat-label>
+                                    <mat-select formControlName="mostrarnprodventas">
+                                        <mat-option *ngFor="let option of lstNumero" [value]="option.id">{{option.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-hint align="start">Seleccione una Opción</mat-hint>
+                                    <mat-error *ngIf="form02.get('mostrarnprodventas').hasError('required')">Seleccione una Opción</mat-error>
+                                </mat-form-field>
+                                <mat-form-field fxFlex="50">
+                                    <mat-label>Mostar n° Productos para Movimientos:</mat-label>
+                                    <mat-select formControlName="mostrarnprodmovimientos">
+                                        <mat-option *ngFor="let option of lstNumero" [value]="option.id">{{option.name}}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-hint align="start">Seleccione una Opción</mat-hint>
+                                    <mat-error *ngIf="form02.get('mostrarnprodmovimientos').hasError('required')">Seleccione una Opción</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 ml-6 border-b" fxLayout="row" fxLayoutAlign="start center">
+                        <h4 class="subtitle m-0">Permitir mostrar etiquetas:</h4>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div fxLayout="column" class="margenesForms">
+                        <div fxLayout="column" fxLayoutGap="8px">
+                            <div fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                                <div fxFlex="50">
+                                    <mat-label>Productos sin Stock:</mat-label>
+                                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="mostraretiqsinstock">
+                                        <mat-radio-button value="1" (click)="validaEtiquetas(1,1)">SI</mat-radio-button>
+                                        <mat-radio-button value="0" (click)="validaEtiquetas(1,0)">NO</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                                <mat-form-field fxFlex="50">
+                                    <mat-label>Etiqueta</mat-label>
+                                    <input matInput maxlength="50" class="uppercase" formControlName="etiquetasinstock" required>
+                                    <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                                    <mat-hint align="start">Ingrese los datos de la etiqueta</mat-hint>
+                                    <mat-error *ngIf="form02.get('etiquetasinstock').hasError('required')">Ingrese los datos de la etiqueta</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="mt-3" fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                            <div fxFlex="50">
+                                <mat-label>Productos con Stock mínimo:</mat-label>
+                                <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="mostraretiqstockmin">
+                                    <mat-radio-button value="1" (click)="validaEtiquetas(2,1)">SI</mat-radio-button>
+                                    <mat-radio-button value="0" (click)="validaEtiquetas(2,0)">NO</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                            <mat-form-field fxFlex="50">
+                                <mat-label>Etiqueta</mat-label>
+                                <input matInput maxlength="50" class="uppercase" formControlName="etiquetastockmin" required>
+                                <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                                <mat-hint align="start">Ingrese los datos de la etiqueta</mat-hint>
+                                <mat-error *ngIf="form02.get('etiquetastockmin').hasError('required')">Ingrese los datos de la etiqueta</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="mt-3" fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
+                            <div fxFlex="50">
+                                <mat-label>Productos con Stock:</mat-label>
+                                <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="mostraretiqconstock">
+                                    <mat-radio-button value="1" (click)="validaEtiquetas(3,1)">SI</mat-radio-button>
+                                    <mat-radio-button value="0" (click)="validaEtiquetas(3,0)">NO</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                            <mat-form-field fxFlex="50">
+                                <mat-label>Etiqueta</mat-label>
+                                <input matInput maxlength="50" class="uppercase" formControlName="etiquetaconstock" required>
+                                <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                                <mat-hint align="start">Ingrese los datos de la etiqueta</mat-hint>
+                                <mat-error *ngIf="form02.get('etiquetaconstock').hasError('required')">Ingrese los datos de la etiqueta</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                        <button mat-raised-button
+                            class="bg-botones-principal" *ngIf="btnRegistro"
+                            [disabled]="habilitaBtnReg2" [class.spinner]="spinBtnReg"
+                            style="margin-right: 6px;" (click)="registrarParte02()"
+                            matTooltip="Registrar Información">
+                            <mat-icon>save</mat-icon>
+                            Registrar
+                        </button>
+                    </div>
+
+                </mat-tab>
+            </mat-tab-group>
+
+        </div>
+    </vex-page-layout-content>
+</vex-page-layout>

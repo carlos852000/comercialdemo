@@ -1,0 +1,165 @@
+<!--<vex-secondary-toolbar current="Precios">-->
+  
+  <!--<vex-page-layout>
+    <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+    <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+      [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">-->
+      <div class="card overflow-auto -mt-2">
+        <!--TITULO SISTEMA-->
+        <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+            <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+                <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                </span>
+                <span @fadeInRight class="block">Precio Específicos</span>
+            </h2>
+            <span fxFlex></span>
+            <button (click)="crearProductoPrecio()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+            matTooltip="Registrar Precio Específico" type="button">
+            <mat-icon [icIcon]="icAdd"></mat-icon>
+            </button>
+            <button (click)="Cancelar()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+                matTooltip="Regresar" type="button">
+                <mat-icon [icIcon]="icReturn"></mat-icon>
+            </button>
+        </div>
+        <!--TITULO SISTEMA-->
+  
+        <!--BANDEJA DE INFORMACIÓN-->
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" [formGroup]="form">
+          <div class="card" fxFlex="auto">
+            <!--FILTRO-->
+            <div class="px-2 py-2" fxLayout="column">
+                <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto" appearance="fill">
+                        <mat-label>Nombre de Producto</mat-label>
+                        <input formControlName="nombreProducto" matInput maxlength="255" minlength="3" [readonly]="true">
+                        <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                        <!--<mat-hint align="start">Información del producto</mat-hint>-->
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto">
+                    <mat-label>Nombre de Precio Específico</mat-label>
+                    <input formControlName="nombre" matInput maxlength="255" minlength="3">
+                    </mat-form-field>
+                    <mat-form-field fxFlex="auto">
+                    <mat-label>Filtrar por:</mat-label>
+                    <mat-select formControlName="filtroBusk" (selectionChange)="cambiaFiltroBusk()">
+                        <mat-option *ngFor="let option of filtro" [value]="option.valor">{{option.valor}}
+                        </mat-option>
+                    </mat-select>
+                    </mat-form-field>
+                    <div class="py-2" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                        <button class="bg-botones-principal text-white mt-3 mb-3" matTooltip="Buscar Grupo"
+                            (click)="listaPreciosxGrupo(pagina)" mat-raised-button type="button">
+                            <ic-icon [icon]="icSearch" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="20px">
+                            </ic-icon>
+                            <span>Buscar</span>
+                        </button>
+                    </div>
+  
+                </div>
+            </div>
+            <!--FILTRO-->
+  
+            <div class="spinner-container" *ngIf="loadingProductosPrecios">
+              <br /><br />
+              <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+              <br /><br />
+            </div>
+  
+            <!--TABLA DE DATOS-->
+            <table [dataSource]="dataSource" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingProductosPrecios">
+              <ng-container matColumnDef="correlativo">
+                <th mat-header-cell *matHeaderCellDef width="5%">#</th>
+                <td mat-cell *matCellDef="let element; let i = index">
+                  {{ i + 1 + numeracion}}-
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef width="17%">Nombre</th>
+                <td mat-cell *matCellDef="let element;">
+                  {{ element.nombre }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="aplica">
+                <th mat-header-cell *matHeaderCellDef width="15%">Aplica a:</th>
+                <td mat-cell *matCellDef="let element;">
+                  {{ element.nombregrupo }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="ilimitado">
+                <th mat-header-cell *matHeaderCellDef width="10%">Ilimitado:</th>
+                <td mat-cell *matCellDef="let element;">
+                  {{ element.txtilimitado }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="fechas">
+                <th mat-header-cell *matHeaderCellDef width="15%">Fechas:</th>
+                <td mat-cell *matCellDef="let element;">
+                  <span *ngIf="element.ilimitado == 1">{{ element.fechainicio | date: "dd/MM/yyyy" }} AL {{ element.fechafin | date: "dd/MM/yyyy" }}</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="tipo">
+                <th mat-header-cell *matHeaderCellDef width="10%">Tipo:</th>
+                <td mat-cell *matCellDef="let element;">
+                  {{ element.txtcantidad }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="cantidad">
+                <th mat-header-cell *matHeaderCellDef width="9%">Cantidad:</th>
+                <td mat-cell *matCellDef="let element;">
+                  {{ element.cantidad }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="dcto">
+                <th mat-header-cell *matHeaderCellDef width="9%">Dcto:</th>
+                <td mat-cell *matCellDef="let element;">
+                  {{ element.descuento }}
+                  <span *ngIf="element.tipodcto == 1">S/.</span>
+                  <span *ngIf="element.tipodcto !== 1">%</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="accion">
+                <th mat-header-cell *matHeaderCellDef width="10%">Acción</th>
+                <td mat-cell *matCellDef="let element;">
+                  <button mat-mini-fab class="bg-botones-principal" [disabled]="habilitaBtnReg"
+                    [class.spinner]="spinBtnReg" style="margin-right: 6px;" matTooltip="Modificar Precio Específico"
+                    (click)="actualizarProductoPrecio(element)">
+                    <ic-icon [icon]="icEdit" inline="true" size="20px"></ic-icon>
+                  </button>
+  
+                  <button mat-mini-fab class="bg-botones-secundario" [disabled]="habilitaBtnReg"
+                    [class.spinner]="spinBtnReg" style="margin-right: 6px;" matTooltip="Eliminar Precio Específico"
+                    (click)="eliminarProductoPrecio(element)">
+                    <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+              <tr *matRowDef="let row; columns: displayedColumns;" @fadeInUp
+                class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+            </table>
+            <div *ngIf="dataSource?.data?.length===0" class="no-records">
+              <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                <div class="mt-0 mb-0 text-secondary">No existen iformación registrada en este momento.
+                </div>
+              </div>
+            </div>
+            <!--PAGINACIÓN-->
+            <mat-paginator [hidePageSize]="true" [length]="totalRegistros" [pageIndex]="pageIndex" class="sticky left-0"
+              [pageSize]="totalRegistrosPorPagina" (page)="listarPorPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <!--TABLA DE DATOS-->
+  
+          </div>
+  
+        </div>
+        <!--BANDEJA DE INFORMACIÓN-->
+  
+      </div>
+  
+     <!--</vex-page-layout-content>
+ </vex-page-layout>-->
+  

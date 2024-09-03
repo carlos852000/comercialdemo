@@ -1,0 +1,57 @@
+<div class="w-full h-full bg-pattern" fxLayout="column" fxLayoutAlign="center center">
+    <div @fadeInUp class="card overflow-hidden w-full max-w-xs">
+      <div class="p-6 pb-0" fxLayout="column" fxLayoutAlign="center center">
+        <div class="fill-current text-center">
+          <img class="w-18" src="assets/img/demo/logo.jpeg">
+        </div>
+      </div>
+  
+      <div class="text-center mt-4">
+        <h2 class="title m-0">Bienvenido al SisComercial</h2>
+        <h4 class="body-2 text-secondary m-0">Ingrese sus credenciales.</h4>
+      </div>
+  
+      <div [formGroup]="form" class="p-6" fxLayout="column" fxLayoutGap="16px">
+        <div fxFlex="auto" fxLayout="column">
+          <mat-form-field fxFlex="grow">
+            <mat-label>Usuario</mat-label>
+            <input 
+            formControlName="usuario" 
+            matInput required
+            maxlength="255"
+            minlength="8">
+            <mat-error *ngIf="form.get('usuario').hasError('required')">Ingrese su usuario</mat-error>
+          </mat-form-field>
+          <mat-form-field fxFlex="grow">
+            <mat-label>Contraseña</mat-label>
+            <input 
+            [type]="inputType" 
+            formControlName="clave" 
+            matInput required
+            maxlength="255"
+            minlength="5">
+            <button (click)="toggleVisibility()" mat-icon-button matSuffix matTooltip="Toggle Visibility" type="button">
+              <mat-icon *ngIf="visible" [icIcon]="icVisibility"></mat-icon>
+              <mat-icon *ngIf="!visible" [icIcon]="icVisibilityOff"></mat-icon>
+            </button>
+            <mat-error *ngIf="form.get('clave').hasError('required')">Ingrese su contraseña</mat-error>
+          </mat-form-field>
+        </div>
+  
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <a [routerLink]="['/recupera-clave']" class="caption">¿Olvidste tu contraseña?</a>
+        </div>
+  
+        <button 
+          (click)="ingresar()" 
+          color="primary" 
+          [class.spinner]="loading"
+          [disabled]="loading"
+          mat-raised-button type="button">
+          INGRESAR
+        </button>
+  
+      </div>
+    </div>
+  </div>
+  

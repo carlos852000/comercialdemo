@@ -1,0 +1,373 @@
+<vex-secondary-toolbar current="{{itemPrincipal}}" *ngIf="accesoFormulario">
+    <vex-breadcrumbs [crumbs]="['General']" class="flex-auto"></vex-breadcrumbs>
+    <button class="ml-2" color="primary" mat-icon-button type="button">
+        <mat-icon [icIcon]="icMoreVert"></mat-icon>
+    </button>
+</vex-secondary-toolbar>
+
+<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="!accesoFormulario" class="py-40">
+    <div @fadeInUp fxFlex="auto">
+        <blockquote *ngIf="validandoPermiso"
+            style="margin: 0px; color: #4d4d4d; text-align: center;">
+            Verificando este módulo. Un momento por favor ...
+            <div class="spinner-container" *ngIf="validandoPermiso">
+                <br />
+                <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                <br />
+            </div>
+        </blockquote>
+        <blockquote *ngIf="!validandoPermiso"
+            style="margin: 0px; color: #4d4d4d; text-align: center;">
+            Ud. no tiene permisos para acceder a este módulo.
+        </blockquote>
+    </div>
+</div>
+
+<vex-page-layout *ngIf="accesoFormulario">
+    <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+    <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+        [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+        <div class="card overflow-auto -mt-16">
+            <!--TITULO SISTEMA-->
+            <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+                <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+                    <span @scaleIn
+                        class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                        <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <span @fadeInRight class="block">Gestionar Rubros <span *ngIf="txtRubro" style="font-weight: bold;">{{txtRubro}}</span></span>
+                </h2>
+                <span fxFlex></span>
+                <button (click)="crearRubro()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+                    matTooltip="Registrar Rubro" type="button" *ngIf="btnNuevo && (selectTab == 0)">
+                    <mat-icon [icIcon]="icAdd"></mat-icon>
+                </button>
+                <button (click)="crearUMedida()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+                    matTooltip="Registrar Unidad Medida" type="button" *ngIf="btnNuevo && (selectTab == 1)">
+                    <mat-icon [icIcon]="icAdd"></mat-icon>
+                </button>
+                <button (click)="crearCaracteristica()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+                    matTooltip="Registrar Caracteristica" type="button" *ngIf="btnNuevo && (selectTab == 2)">
+                    <mat-icon [icIcon]="icAdd"></mat-icon>
+                </button>
+                <button (click)="crearCaracteristicaDetalle()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+                    matTooltip="Registrar Caracteristica" type="button" *ngIf="btnNuevo && (selectTab == 3)">
+                    <mat-icon [icIcon]="icAdd"></mat-icon>
+                </button>
+                <button (click)="regresarRubro()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+                    matTooltip="Regresar" type="button" *ngIf="(selectTab !== 0 && selectTab !== 3)">
+                    <mat-icon [icIcon]="icReturn"></mat-icon>
+                </button>
+                <button (click)="regresarCaracteristicas()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+                    matTooltip="Regresar" type="button" *ngIf="selectTab == 3">
+                    <mat-icon [icIcon]="icReturn"></mat-icon>
+                </button>
+            </div>
+            <!--TITULO SISTEMA-->
+
+            <!--BANDEJA DE INFORMACIÓN-->
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" [formGroup]="form" *ngIf="accesoFormulario">
+                <div class="card" fxFlex="auto">
+                    <!--FILTRO--> 
+                    <div class="px-2 py-2" fxLayout="column" *ngIf="selectTab == 0">
+                        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                            <mat-form-field fxFlex="auto">
+                                <mat-label>Rubro</mat-label>
+                                <input formControlName="nombrerubro" matInput maxlength="255" minlength="3">
+                            </mat-form-field>
+                            <mat-form-field fxFlex="auto">
+                                <mat-label>Filtrar por:</mat-label>
+                                <mat-select formControlName="filtroBusk" (selectionChange)="cambiaFiltroBusk()">
+                                    <mat-option *ngFor="let option of filtro" [value]="option.valor">{{option.valor}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <div class="py-2" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                                <button class="bg-botones-principal text-white mt-3 mb-3"
+                                    matTooltip="Buscar Tienda"
+                                    (click)="listaRubros(pagina)" mat-raised-button type="button">
+                                    <ic-icon [icon]="icSearch" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2"
+                                        inline="true" size="20px"></ic-icon>
+                                    <span>Buscar</span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!--FILTRO--> 
+
+                    <mat-tab-group [selectedIndex]="selectTab" (selectedTabChange)="onTabChanged($event)">
+                        <mat-tab label="Listado de Rubros" *ngIf="tabPrincipal">
+                            <div class="spinner-container" *ngIf="loadingRubros">
+                                <br /><br />
+                                <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                                <br /><br />
+                            </div>
+        
+                            <!--RUBRO-->
+                            <!--TABLA DE DATOS-->
+                            <table [dataSource]="dataSource" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingRubros">
+                                <ng-container matColumnDef="correlativo" >
+                                    <th mat-header-cell *matHeaderCellDef width="10%">#</th>
+                                    <td mat-cell *matCellDef="let element; let i = index">
+                                        {{ i + 1 + numeracion}}-
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="rubro">
+                                    <th mat-header-cell *matHeaderCellDef width="25%">Rubro</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        {{ element.descripcion }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="accion">
+                                    <th mat-header-cell *matHeaderCellDef width="20%">Acción</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        <button mat-mini-fab
+                                            class="bg-botones-principal"
+                                            [disabled]="habilitaBtnReg" 
+                                            style="margin-right: 6px;"
+                                            matTooltip="Modificar Rubro" *ngIf="btnModificar"
+                                            (click)="actualizarRubro(element)">
+                                            <ic-icon [icon]="icEdit" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                        <button mat-mini-fab
+                                            class="bg-botones-secundario"
+                                            [disabled]="habilitaBtnReg" [class.spinner]="spinBtnReg"
+                                            style="margin-right: 6px;"
+                                            matTooltip="Eliminar Rubro" *ngIf="btnEliminar"
+                                            (click)="eliminarRubro(element)">
+                                            <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                        <button mat-mini-fab
+                                            class="bg-blue-400"
+                                            [disabled]="habilitaBtnReg"
+                                            style="margin-right: 6px;"
+                                            matTooltip="Unidades de Medida" *ngIf="btnUnidadesMedida"
+                                            (click)="unidadMedida(element)">
+                                            <mat-icon>menu_open</mat-icon>
+                                        </button>
+
+                                        <button mat-mini-fab
+                                            class="bg-blue-400"
+                                            [disabled]="habilitaBtnReg"
+                                            style="margin-right: 6px;"
+                                            matTooltip="Características de Productos" *ngIf="btnCaracteristica"
+                                            (click)="caracteristicas(element)">
+                                            <mat-icon>app_registration</mat-icon>
+                                        </button>
+
+                                    </td>
+                                </ng-container>
+                                <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                                <tr *matRowDef="let row; columns: displayedColumns;" @fadeInUp
+                                    class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                            </table>
+                            <div *ngIf="dataSource?.data?.length===0" class="no-records">
+                                <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                                    <div class="mt-0 mb-0 text-secondary">No existen iformación registrada en este momento.
+                                    </div>
+                                </div>
+                            </div>
+                            <!--PAGINACIÓN-->
+                            <mat-paginator [hidePageSize]="true" [length]="totalRegistros" [pageIndex]="pageIndex" class="sticky left-0"
+                                [pageSize]="totalRegistrosPorPagina" (page)="listarPorPagina($event)"
+                                showFirstLastButtons>
+                            </mat-paginator>
+                            <!--TABLA DE DATOS-->
+                            <!--RUBRO-->
+
+                        </mat-tab>
+                        <mat-tab label="{{labelTab}}" *ngIf="tabSecundario">
+                            <div class="spinner-container" *ngIf="loadingItems">
+                                <br /><br />
+                                <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                                <br /><br />
+                            </div>
+                            <!--UNIDAD MEDIDA-->
+                            <!--TABLA DE DATOS-->
+                            <table [dataSource]="dataSourceDetalle" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingItems && (selectTab == 1)">
+                                <ng-container matColumnDef="correlativo" >
+                                    <th mat-header-cell *matHeaderCellDef width="10%">#</th>
+                                    <td mat-cell *matCellDef="let element; let i = index">
+                                        {{ i + 1 + numeracion}}-
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="nombre">
+                                    <th mat-header-cell *matHeaderCellDef width="25%">Unidad Medida</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        {{ element.descripcion }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="cantidad">
+                                    <th mat-header-cell *matHeaderCellDef width="25%">Cantidad</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        {{ element.cantidad }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="accion">
+                                    <th mat-header-cell *matHeaderCellDef width="20%">Acción</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        <button mat-mini-fab
+                                            class="bg-botones-principal"
+                                            [disabled]="habilitaBtnReg" 
+                                            style="margin-right: 6px;"
+                                            matTooltip="Modificar Unidad de Medida"
+                                            (click)="actualizarUMedida(element)">
+                                            <ic-icon [icon]="icEdit" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                        <button mat-mini-fab
+                                            class="bg-botones-secundario"
+                                            [disabled]="habilitaBtnReg" [class.spinner]="spinBtnReg"
+                                            style="margin-right: 6px;"
+                                            matTooltip="Eliminar Unidad de Medida"
+                                            (click)="eliminarUnidadMedida(element)">
+                                            <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                    </td>
+                                </ng-container>
+                                <tr *matHeaderRowDef="displayedColumnsUnidadMedida" mat-header-row></tr>
+                                <tr *matRowDef="let row; columns: displayedColumnsUnidadMedida;" @fadeInUp
+                                    class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                            </table>
+                            <!--UNIDAD MEDIDA-->
+
+                            <!--CARACTERISTICAS-->
+                            <!--TABLA DE DATOS-->
+                            <table [dataSource]="dataSourceDetalle" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingItems && (selectTab == 2)">
+                                <ng-container matColumnDef="correlativo" >
+                                    <th mat-header-cell *matHeaderCellDef width="10%">#</th>
+                                    <td mat-cell *matCellDef="let element; let i = index">
+                                        {{ i + 1 + numeracion}}-
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="nombre">
+                                    <th mat-header-cell *matHeaderCellDef width="25%">Caracteristica</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        {{ element.descripcion }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="accion">
+                                    <th mat-header-cell *matHeaderCellDef width="20%">Acción</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        <button mat-mini-fab
+                                            class="bg-botones-principal"
+                                            [disabled]="habilitaBtnReg" 
+                                            style="margin-right: 6px;"
+                                            matTooltip="Modificar Caracteristicas"
+                                            (click)="actualizarCaracteristica(element)">
+                                            <ic-icon [icon]="icEdit" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                        <button mat-mini-fab
+                                            class="bg-botones-secundario"
+                                            [disabled]="habilitaBtnReg" [class.spinner]="spinBtnReg"
+                                            style="margin-right: 6px;"
+                                            matTooltip="Eliminar Caracteristicas"
+                                            (click)="eliminarCaracteristica(element)">
+                                            <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                        <button mat-mini-fab
+                                            class="bg-botones-principal"
+                                            [disabled]="habilitaBtnReg" [class.spinner]="spinBtnReg"
+                                            style="margin-right: 6px;"
+                                            matTooltip="Ver Items"
+                                            (click)="verItemsCaracteristicas(element)">
+                                            <ic-icon [icon]="icViewCompact" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                    </td>
+                                </ng-container>
+                                <tr *matHeaderRowDef="displayedColumnsCaracteristicas" mat-header-row></tr>
+                                <tr *matRowDef="let row; columns: displayedColumnsCaracteristicas;" @fadeInUp
+                                    class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                            </table>
+                            <!--CARACTERISTICAS-->
+
+                            <div *ngIf="dataSourceDetalle?.data?.length===0" class="no-records">
+                                <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                                    <div class="mt-0 mb-0 text-secondary">No existen iformación registrada en este momento.
+                                    </div>
+                                </div>
+                            </div>
+                            <!--PAGINACIÓN-->
+                            <mat-paginator [hidePageSize]="true" [length]="totalRegistrosItem" [pageIndex]="pageIndexItem" class="sticky left-0"
+                                [pageSize]="totalRegistrosPorPagina" (page)="listarPorPaginaDetalle($event)"
+                                showFirstLastButtons>
+                            </mat-paginator>
+                            <!--TABLA DE DATOS-->
+                            
+                        </mat-tab>
+
+                        <!--ITEMS CARACTERISTICAS-->
+                        <mat-tab label="{{labelTab}}" *ngIf="tabItems">
+                            <!--TABLA DE DATOS-->
+                            <table [dataSource]="dataSourceDetalleItems" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingItems && (selectTab == 3)">
+                                <ng-container matColumnDef="correlativo" >
+                                    <th mat-header-cell *matHeaderCellDef width="10%">#</th>
+                                    <td mat-cell *matCellDef="let element; let i = index">
+                                        {{ i + 1 + numeracion}}-
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="nombre">
+                                    <th mat-header-cell *matHeaderCellDef width="25%">Item</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        {{ element.nombre }}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="accion">
+                                    <th mat-header-cell *matHeaderCellDef width="20%">Acción</th>
+                                    <td mat-cell *matCellDef="let element;">
+                                        <button mat-mini-fab
+                                            class="bg-botones-principal"
+                                            [disabled]="habilitaBtnReg" 
+                                            style="margin-right: 6px;"
+                                            matTooltip="Modificar Item"
+                                            (click)="actualizarCaracteristicaDetalle(element)">
+                                            <ic-icon [icon]="icEdit" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                        <button mat-mini-fab
+                                            class="bg-botones-secundario"
+                                            [disabled]="habilitaBtnReg" [class.spinner]="spinBtnReg"
+                                            style="margin-right: 6px;"
+                                            matTooltip="Eliminar Item"
+                                            (click)="eliminarCaracteristicaDetalle(element)">
+                                            <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                                        </button>
+
+                                    </td>
+                                </ng-container>
+                                <tr *matHeaderRowDef="displayedColumnsCaracteristicasItem" mat-header-row></tr>
+                                <tr *matRowDef="let row; columns: displayedColumnsCaracteristicasItem;" @fadeInUp
+                                    class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                            </table>
+                            <div *ngIf="dataSourceDetalleItems?.data?.length===0" class="no-records">
+                                <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                                    <div class="mt-0 mb-0 text-secondary">No existen iformación registrada en este momento.
+                                    </div>
+                                </div>
+                            </div>
+                            <!--PAGINACIÓN-->
+                            <mat-paginator [hidePageSize]="true" [length]="totalRegistrosItemCaract" [pageIndex]="pageIndexItemCaract" class="sticky left-0"
+                                [pageSize]="totalRegistrosPorPagina" (page)="listarPorPaginaDetalleTems($event)"
+                                showFirstLastButtons>
+                            </mat-paginator>
+                            <!--TABLA DE DATOS-->
+                        </mat-tab>
+                        <!--ITEMS CARACTERISTICAS-->
+
+                    </mat-tab-group>
+                </div>
+
+            </div>
+            <!--BANDEJA DE INFORMACIÓN-->
+
+        </div>
+
+    </vex-page-layout-content>
+</vex-page-layout>

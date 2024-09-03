@@ -1,0 +1,241 @@
+<vex-secondary-toolbar current="{{itemPrincipal}}" *ngIf="accesoFormulario">
+    <vex-breadcrumbs [crumbs]="['Grupo de Clientes']" class="flex-auto"></vex-breadcrumbs>
+    <button class="ml-2" color="primary" mat-icon-button type="button">
+      <mat-icon [icIcon]="icMoreVert"></mat-icon>
+    </button>
+  </vex-secondary-toolbar>
+  
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="!accesoFormulario" class="py-40">
+    <div @fadeInUp fxFlex="auto">
+      <blockquote *ngIf="validandoPermiso" style="margin: 0px; color: #4d4d4d; text-align: center;">
+        Verificando este módulo. Un momento por favor ...
+        <div class="spinner-container" *ngIf="validandoPermiso">
+          <br />
+          <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+          <br />
+        </div>
+      </blockquote>
+      <blockquote *ngIf="!validandoPermiso" style="margin: 0px; color: #4d4d4d; text-align: center;">
+        Ud. no tiene permisos para acceder a este módulo.
+      </blockquote>
+    </div>
+  </div>
+  
+  <vex-page-layout *ngIf="accesoFormulario">
+    <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+    <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+      [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+      <div class="card overflow-auto -mt-16">
+        <!--TITULO SISTEMA-->
+        <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+          <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+            <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+              <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+            </span>
+            <span @fadeInRight class="block">Grupo de Clientes <span *ngIf="txtGrupo" style="font-weight: bold;">{{txtGrupo}}</span></span>
+          </h2>
+          <span fxFlex></span>
+          <button (click)="crearGrupo()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+            matTooltip="Registrar Grupo de Clientes" type="button" *ngIf="btnNuevo && (selectTab == 0)">
+            <mat-icon [icIcon]="icAdd"></mat-icon>
+          </button>
+          <button (click)="crearCliente()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+              matTooltip="Registrar Cliente" type="button" *ngIf="btnNuevo && (selectTab == 1)">
+              <mat-icon [icIcon]="icAdd"></mat-icon>
+          </button>
+          <button (click)="regresarGrupo()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+              matTooltip="Regresar" type="button" *ngIf="selectTab !== 0">
+              <mat-icon [icIcon]="icReturn"></mat-icon>
+          </button>
+        </div>
+        <!--TITULO SISTEMA-->
+  
+        <!--BANDEJA DE INFORMACIÓN-->
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="accesoFormulario">
+          <div class="card" fxFlex="auto">
+            <!--FILTRO-->
+            <div class="px-2 py-2" fxLayout="column">
+
+              <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0" [formGroup]="form" *ngIf="selectTab == 0">
+                <mat-form-field fxFlex="auto">
+                  <mat-label>Nombre de Grupo</mat-label>
+                  <input formControlName="nombre" matInput maxlength="255" minlength="3">
+                </mat-form-field>
+                <mat-form-field fxFlex="auto">
+                  <mat-label>Filtrar por:</mat-label>
+                  <mat-select formControlName="filtroBusk" (selectionChange)="cambiaFiltroBusk()">
+                    <mat-option *ngFor="let option of filtro" [value]="option.valor">{{option.valor}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <div class="py-2" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                  <button class="bg-botones-principal text-white mt-3 mb-3" matTooltip="Buscar Grupo de Cliente"
+                    (click)="listaGrupoClientes(pagina)" mat-raised-button type="button">
+                    <ic-icon [icon]="icSearch" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="20px">
+                    </ic-icon>
+                    <span>Buscar</span>
+                  </button>
+                </div>
+              </div>
+
+              <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0" [formGroup]="form02" *ngIf="selectTab == 1">
+                <mat-form-field fxFlex="auto">
+                  <mat-label>Cliente</mat-label>
+                  <input formControlName="nombre" matInput maxlength="255" minlength="3">
+                </mat-form-field>
+                <mat-form-field fxFlex="auto">
+                  <mat-label>Filtrar por:</mat-label>
+                  <mat-select formControlName="filtroBusk" (selectionChange)="cambiaFiltroBuskSec()">
+                    <mat-option *ngFor="let option of filtro" [value]="option.valor">{{option.valor}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <div class="py-2" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                  <button class="bg-botones-principal text-white mt-3 mb-3" matTooltip="Buscar Cliente"
+                    (click)="listarClientes(rowDetalle,paginaItems)" mat-raised-button type="button">
+                    <ic-icon [icon]="icSearch" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="20px">
+                    </ic-icon>
+                    <span>Buscar</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+            <!--FILTRO-->
+  
+            <mat-tab-group [selectedIndex]="selectTab" (selectedTabChange)="onTabChanged($event)">
+              <mat-tab label="Listado de Grupos" *ngIf="tabPrincipal">
+
+                <div class="spinner-container" *ngIf="loadingGrupoClientes">
+                  <br /><br />
+                  <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                  <br /><br />
+                </div>
+      
+                <!--TABLA DE DATOS-->
+                <table [dataSource]="dataSource" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingGrupoClientes">
+                  <ng-container matColumnDef="correlativo">
+                    <th mat-header-cell *matHeaderCellDef width="10%">#</th>
+                    <td mat-cell *matCellDef="let element; let i = index">
+                      {{ i + 1 + numeracion}}-
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="grupo">
+                    <th mat-header-cell *matHeaderCellDef width="70%">Grupo de Clientes</th>
+                    <td mat-cell *matCellDef="let element;">
+                      {{ element.nombre }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="accion">
+                    <th mat-header-cell *matHeaderCellDef width="30%">Acción</th>
+                    <td mat-cell *matCellDef="let element;">
+                      <button mat-mini-fab class="bg-botones-principal" [disabled]="habilitaBtnReg"
+                        [class.spinner]="spinBtnReg" style="margin-right: 6px;" matTooltip="Modificar Grupo"
+                        *ngIf="btnModificar" (click)="actualizarGrupo(element)">
+                        <ic-icon [icon]="icEdit" inline="true" size="20px"></ic-icon>
+                      </button>
+      
+                      <button mat-mini-fab class="bg-botones-secundario" [disabled]="habilitaBtnReg"
+                        [class.spinner]="spinBtnReg" style="margin-right: 6px;" matTooltip="Eliminar Grupo"
+                        *ngIf="btnEliminar" (click)="eliminarGrupo(element)">
+                        <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                      </button>
+    
+                      <button mat-mini-fab
+                          [disabled]="habilitaBtnReg" 
+                          class="bg-blue-400"
+                          style="margin-left: 4px;"
+                          matTooltip="Agregar Clientes" *ngIf="btnClientes"
+                          (click)="gestionarClientes(element)">
+                          <mat-icon>group_add</mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
+                  <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                  <tr *matRowDef="let row; columns: displayedColumns;" @fadeInUp
+                    class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                </table>
+                <div *ngIf="dataSource?.data?.length===0" class="no-records">
+                  <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                    <div class="mt-0 mb-0 text-secondary">No existen iformación registrada en este momento.
+                    </div>
+                  </div>
+                </div>
+                <!--PAGINACIÓN-->
+                <mat-paginator [hidePageSize]="true" [length]="totalRegistros" [pageIndex]="pageIndex" class="sticky left-0"
+                  [pageSize]="totalRegistrosPorPagina" (page)="listarPorPagina($event)" showFirstLastButtons>
+                </mat-paginator>
+                <!--TABLA DE DATOS-->
+              </mat-tab>
+
+              <mat-tab label="{{labelTab}}" *ngIf="tabSecundario">
+                <div class="spinner-container" *ngIf="loadingClientes">
+                  <br /><br />
+                  <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                  <br /><br />
+                </div>
+                <!--TABLA DE DATOS-->
+                <table [dataSource]="dataSourceDetalle" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingClientes && (selectTab == 1)">
+                    <ng-container matColumnDef="correlativo" >
+                        <th mat-header-cell *matHeaderCellDef width="10%">#</th>
+                        <td mat-cell *matCellDef="let element; let i = index">
+                            {{ i + 1 + numeracion}}-
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="nombre">
+                        <th mat-header-cell *matHeaderCellDef width="40%">Cliente</th>
+                        <td mat-cell *matCellDef="let element;">
+                          {{ element.nombre }} {{ element.apellidopaterno }} {{ element.apellidomaterno }}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="datos">
+                        <th mat-header-cell *matHeaderCellDef width="30%">Datos</th>
+                        <td mat-cell *matCellDef="let element;">
+                            <b>DNI: </b>{{ element.numerodocumento }}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="accion">
+                        <th mat-header-cell *matHeaderCellDef width="20%">Acción</th>
+                        <td mat-cell *matCellDef="let element;">
+                            <button mat-mini-fab
+                                class="bg-botones-secundario"
+                                [disabled]="habilitaBtnReg" [class.spinner]="spinBtnReg"
+                                style="margin-right: 6px;"
+                                matTooltip="Eliminar Cliente"
+                                (click)="eliminarCliente(element)">
+                                <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                            </button>
+
+                        </td>
+                    </ng-container>
+                    <tr *matHeaderRowDef="displayedColumnsClientes" mat-header-row></tr>
+                    <tr *matRowDef="let row; columns: displayedColumnsClientes;" @fadeInUp
+                        class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                </table>
+                <div *ngIf="dataSourceDetalle?.data?.length===0" class="no-records">
+                  <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                      <div class="mt-0 mb-0 text-secondary">No existen iformación registrada en este momento.
+                      </div>
+                  </div>
+                </div>
+                <!--PAGINACIÓN-->
+                <mat-paginator [hidePageSize]="true" [length]="totalRegistrosItem" [pageIndex]="pageIndexItem" class="sticky left-0"
+                    [pageSize]="totalRegistrosPorPagina" (page)="listarPorPaginaDetalle($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+                <!--TABLA DE DATOS-->
+              </mat-tab>
+            </mat-tab-group>
+
+            
+  
+          </div>
+  
+        </div>
+        <!--BANDEJA DE INFORMACIÓN-->
+  
+      </div>
+  
+    </vex-page-layout-content>
+  </vex-page-layout>
+  

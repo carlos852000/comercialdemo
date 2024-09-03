@@ -1,0 +1,155 @@
+<form [formGroup]="form">
+    <div fxLayout="row" class="mat-dialog-title" fxLayoutAlign="start center" mat-dialog-title>
+        <h2 class="headline ml-4" fxFlex="auto">{{tituloForm}}</h2>
+        <button class="text-secondary" mat-dialog-close mat-icon-button type="button" 
+            (click)="cerrarVentana(null)" style="color: white;">
+            <mat-icon [icIcon]="icClose"></mat-icon>
+        </button>
+    </div>
+    <mat-divider class="-mx-6 text-border"></mat-divider>
+    <mat-dialog-content fxLayout="column" >
+        <div class="flex flex-col sm:flex-row">
+            <mat-form-field class="mt-6" fxFlex="50" *ngIf="tipoAccion==1">
+                <mat-label>Tipo Documento:</mat-label>
+                <mat-select formControlName="tipoDocumento"
+                    (selectionChange)="calculaDNI()"
+                    [class.spinner]="loadTipoDocumentos" required
+                    [disabled]="loadTipoDocumentos">
+                    <mat-option *ngFor="let option of listaTipoDocumentos" [value]="option.idcatalogo">{{option.descripcion}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="form.get('tipoDocumento').hasError('required')">Seleccione una Opción</mat-error>
+            </mat-form-field>
+            <div class="mt-6 flex-auto" *ngIf="tipoAccion==2">
+                <mat-label>Tipo Documento:</mat-label>
+                <br>
+                <b>{{datosCliente.tipoDocumento}}</b>
+            </div>
+
+            <mat-form-field class="sm:mt-6 sm:ml-6" fxFlex="50">
+                <mat-label>Nro de DNI</mat-label>
+                <input matInput maxlength="8" class="uppercase" *ngIf="tipoAccion == 1"
+                    vexDirectivasComercial [entrada]='tipoEntradaNumero' formControlName="dni" required
+                    (keyup)="calculaDNI()">
+                <input matInput maxlength="8" class="uppercase" *ngIf="tipoAccion == 2" readonly
+                    vexDirectivasComercial [entrada]='tipoEntradaNumero' formControlName="dni" required
+                    (keyup)="calculaDNI()">
+                <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+                <mat-hint align="start">Ingrese el nro de DNI</mat-hint>
+                <mat-error *ngIf="form.get('dni').hasError('required')">Ingrese el nro de DNI</mat-error>
+            </mat-form-field>
+
+        </div>
+        <div class="spinner-container" *ngIf="loadingClientes">
+            <br /><br />
+            <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+            <br /><br />
+        </div>
+        <div *ngIf="!loadingClientes">
+            <div class="flex flex-col sm:flex-row">
+                <mat-form-field class="mt-6" fxFlex="50">
+                    <mat-label>Apellido Paterno</mat-label>
+                    <input matInput maxlength="250" class="uppercase"
+                        formControlName="apellidopaterno" required>
+                    <mat-icon [icIcon]="icPerson" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese el apellido paterno</mat-hint>
+                    <mat-error *ngIf="form.get('apellidopaterno').hasError('required')">Ingrese el apellido paterno</mat-error>
+                </mat-form-field>
+                <mat-form-field class="sm:mt-6 sm:ml-6" fxFlex="50">
+                    <mat-label>Apellido Materno</mat-label>
+                    <input matInput maxlength="250" class="uppercase" 
+                        formControlName="apellidomaterno" required>
+                    <mat-icon [icIcon]="icPerson" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese el apellido materno</mat-hint>
+                    <mat-error *ngIf="form.get('apellidomaterno').hasError('required')">Ingrese el apellido materno</mat-error>
+                </mat-form-field>
+            </div>
+    
+            <div class="flex flex-col sm:flex-row">
+                <mat-form-field class="mt-6" fxFlex="50">
+                    <mat-label>Nombres</mat-label>
+                    <input matInput maxlength="250" class="uppercase"
+                        formControlName="nombres" required>
+                    <mat-icon [icIcon]="icPerson" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese un nombre</mat-hint>
+                    <mat-error *ngIf="form.get('nombres').hasError('required')">Ingrese un nombre</mat-error>
+                </mat-form-field>
+                <div class="sm:mt-6 sm:ml-6" fxFlex="50">
+                    <p class="mt-0 mb-4 text-secondary">
+                        Seleccione el sexo del usuario:
+                    </p>
+                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="sexo">
+                        <mat-radio-button value="1">Hombre</mat-radio-button>
+                        <mat-radio-button value="0">Mujer</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+    
+            <div class="flex flex-col sm:flex-row">
+                <mat-form-field class="mt-6 flex-auto">
+                    <mat-label>Empresa</mat-label>
+                    <input matInput maxlength="250" class="uppercase"
+                        formControlName="empresa">
+                    <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese los datos de la empresa</mat-hint>
+                </mat-form-field>
+            </div>
+    
+            <div class="flex flex-col sm:flex-row">
+                <mat-form-field class="mt-6 flex-auto">
+                    <mat-label>Dirección</mat-label>
+                    <input matInput maxlength="250" class="uppercase"
+                        formControlName="direccion">
+                    <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese una dirección</mat-hint>
+                </mat-form-field>
+            </div>
+    
+            <div class="flex flex-col sm:flex-row">
+                <mat-form-field class="mt-6" fxFlex="50">
+                    <mat-label>Teléfono</mat-label>
+                    <input matInput maxlength="250" class="uppercase"
+                        formControlName="telefono" vexDirectivasComercial [entrada]='tipoEntradaNumero'>
+                    <mat-icon [icIcon]="icPhone" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese un número de teléfono</mat-hint>
+                </mat-form-field>
+                <mat-form-field class="sm:mt-6 sm:ml-6" fxFlex="50">
+                    <mat-label>RUC</mat-label>
+                    <input matInput maxlength="12" class="uppercase" 
+                        formControlName="ruc" vexDirectivasComercial [entrada]='tipoEntradaNumero'>
+                    <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese un RUC</mat-hint>
+                </mat-form-field>
+            </div>
+    
+            <div class="flex flex-col sm:flex-row">
+                <mat-form-field class="mt-6 flex-auto">
+                    <mat-label>E-mail</mat-label>
+                    <input matInput maxlength="150" formControlName="email">
+                    <mat-icon [icIcon]="icMail" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese un correo electrónico</mat-hint>
+                    <mat-error *ngIf="form.get('email').hasError('pattern')">Ingrese un correo válido</mat-error>
+                </mat-form-field>
+            </div>
+            
+    
+            <mat-form-field class="mt-6 flex-auto full-width">
+                <mat-label>Observación</mat-label>
+                <textarea matInput maxlength="150" class="uppercase" formControlName="observacion"></textarea>
+                <mat-hint align="start">Ingrese una observación</mat-hint>
+            </mat-form-field>
+        </div>
+        
+    </mat-dialog-content>
+
+    <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogNO" 
+            mat-raised-button type="button" (click)="cerrarVentana(null)">Cancelar
+        </button>
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogOk" 
+            [disabled]="habilitaBtnReg"
+            [class.spinner]="spinBtnReg"
+            mat-raised-button type="button" (click)="RegistrarCliente()">{{btnRegistro}}
+        </button>
+    </div>
+</form>

@@ -1,0 +1,194 @@
+<vex-secondary-toolbar current="{{itemPrincipal}}" *ngIf="accesoFormulario">
+    <vex-breadcrumbs [crumbs]="['Movimiento de Mercadería']" class="flex-auto"></vex-breadcrumbs>
+    <button class="ml-2" color="primary" mat-icon-button type="button">
+        <mat-icon [icIcon]="icMoreVert"></mat-icon>
+    </button>
+</vex-secondary-toolbar>
+<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="!accesoFormulario" class="py-40">
+    <div @fadeInUp fxFlex="auto">
+        <div class="spinner-container">
+            <br /><br />
+            <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+            <br /><br />
+        </div>
+    </div>
+</div>
+
+<vex-page-layout *ngIf="accesoFormulario">
+    <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+    <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+        [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+        <div class="card overflow-auto -mt-16">
+
+            <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+                <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+                    <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                        <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <!--@fadeInRight-->
+                    <span class="block">Kardex de Producto</span>
+                </h2>
+                <span fxFlex></span>
+            </div>
+
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="accesoFormulario">
+
+                <div class="card" fxFlex="auto">
+                    <div fxLayout="column" class="margenesForms">
+                        <blockquote class="blockquoteNegro">Información de Ingresos y Salidas</blockquote>
+                        <div class="px-2 py-2" fxLayout="column" >
+                            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0" fxLayoutAlign="end end">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <th style="width: 15%">Producto</th>
+                                        <td style="width: 65%" colspan="2">
+                                            <span class="label label-info"><b>{{datosProducto.nombreProducto}}</b></span>
+                                            <br>
+                                            <span class="label label-inverse"><b>Marca: </b>{{datosProducto.marca}}</span>
+                                        </td>
+                                        <td rowspan="2" style="width: 20%; text-align: center;" class="alert alert-info">
+                                            <b>Cantidad</b>
+                                            <h2 style="font-size: 40px;">{{datosProducto.unidadmedida}}</h2>
+                                            <span class="label label-info">x{{datosProducto.unidadmedidacantidad}}</span>
+                                            <span class="label label-info">=</span>
+                                            <span class="label label-success">{{datosProducto.cantidad}}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 15%">Proveedor</th>
+                                        <td style="width: 45%">
+                                            <span class="label label-info">{{datosProducto.representanteProveedor}}</span>
+                                            <br>
+                                            <span class="label label-inverse"><b>RUC: </b>{{datosProducto.ruc}}</span>
+                                        </td>
+                                        <td style="width: 20%">
+                                            <div style="text-align: right; vertical-align: middle;">
+                                                <button class="bg-botones-principal text-white mt-3 mb-3" matTooltip="Regresar a Listado de Productos"
+                                                    (click)="regresar()" mat-raised-button type="button">
+                                                    <ic-icon [icon]="icReturn" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="20px">
+                                                    </ic-icon>
+                                                    <span>Regresar</span>
+                                                </button>
+                                                
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                            </div>
+                        </div>
+
+
+                        <blockquote class="blockquoteNegro">Por Tiendas</blockquote>
+                        <div class="spinner-container" *ngIf="loadingTienda">
+                            <mat-progress-spinner [diameter]="50" mode="indeterminate" color="accent">
+                            </mat-progress-spinner>
+                            <br />
+                        </div>
+                        <table [dataSource]="dataSourceTienda" class="w-full mat-table-main" mat-table matSort
+                            *ngIf="!loadingTienda">
+                            <ng-container matColumnDef="correlativo">
+                                <th mat-header-cell *matHeaderCellDef width="5%">#</th>
+                                <td mat-cell *matCellDef="let element; let i = index">
+                                    {{ i + 1 }}-
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="tienda">
+                                <th mat-header-cell *matHeaderCellDef width="20%">Fecha</th>
+                                <td mat-cell *matCellDef="let element;">
+                                    {{ element.tienda}}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="cantidad">
+                                <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">Cantidad</th>
+                                <td mat-cell *matCellDef="let element;" class="text-right">
+                                    {{element.cantidad}}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="cantidadunidad">
+                                <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">Cantidad Unid.</th>
+                                <td mat-cell *matCellDef="let element;" class="text-right">
+                                    {{element.cantidadunid}}
+                                </td>
+                            </ng-container>
+                            <tr *matHeaderRowDef="displayedColumnsTienda" mat-header-row></tr>
+                            <tr *matRowDef="let row; columns: displayedColumnsTienda;" @fadeInUp
+                                class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                        </table>
+                        <div *ngIf="dataSourceTienda?.data?.length===0" class="no-records">
+                            <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                                <div class="mt-0 mb-0 text-secondary">No existen información registrada en este momento.
+                                </div>
+                            </div>
+                        </div>
+
+                        <blockquote class="blockquoteNegro">Kardex x Producto</blockquote>
+                        <div class="spinner-container" *ngIf="loading">
+                            <mat-progress-spinner [diameter]="50" mode="indeterminate" color="accent">
+                            </mat-progress-spinner>
+                            <br />
+                        </div>
+                        <table [dataSource]="dataSource" class="w-full mat-table-main" mat-table matSort
+                            *ngIf="!loading">
+                            <ng-container matColumnDef="correlativo">
+                                <th mat-header-cell *matHeaderCellDef width="5%">#</th>
+                                <td mat-cell *matCellDef="let element; let i = index">
+                                    {{ i + 1 }}-
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="fecha">
+                                <th mat-header-cell *matHeaderCellDef width="15%">Fecha</th>
+                                <td mat-cell *matCellDef="let element;">
+                                    {{ element.fecha | date: "dd/MM/yyyy"}}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="tipomovimiento">
+                                <th mat-header-cell *matHeaderCellDef width="20%">Tipo Movimiento</th>
+                                <td mat-cell *matCellDef="let element;">
+                                    {{ element.tipomovimiento }}<br>
+                                    Nro:<b>{{ llenaCeros(element.idtabla,8) }}</b>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="documento">
+                                <th mat-header-cell *matHeaderCellDef width="20%">Documento</th>
+                                <td mat-cell *matCellDef="let element;">
+                                    {{ element.tipodocumento }}: {{element.nrodocumento}}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="simbolo">
+                                <th mat-header-cell *matHeaderCellDef width="10%" class="text-center">Símbolo</th>
+                                <td mat-cell *matCellDef="let element;" class="text-center">
+                                    {{ element.simbolo}}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="cantidad">
+                                <th mat-header-cell *matHeaderCellDef width="15%" class="text-center">Cantidad</th>
+                                <td mat-cell *matCellDef="let element;" class="text-center">
+                                    {{element.cantidad}} {{ element.unidadmedida}}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="actual">
+                                <th mat-header-cell *matHeaderCellDef width="15%" class="text-center">Actual</th>
+                                <td mat-cell *matCellDef="let element;" class="text-center compra-agregada">
+                                    {{ element.cantidadactual}} {{ element.unidadmedida}}
+                                </td>
+                            </ng-container>
+                            <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                            <tr *matRowDef="let row; columns: displayedColumns;" @fadeInUp
+                                class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                        </table>
+                        <div *ngIf="dataSource?.data?.length===0" class="no-records">
+                            <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                                <div class="mt-0 mb-0 text-secondary">No existen información registrada en este momento.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </vex-page-layout-content>
+</vex-page-layout>

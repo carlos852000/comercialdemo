@@ -1,0 +1,32 @@
+<div fxLayout="row" fxLayoutAlign="start center" >
+
+    <mat-toolbar matDialogTitle class="m-0 mat-primary" mat-dialog-title *ngIf="tipoMensaje !== enumTipoMensaje.ERROR">
+        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+            <span class="title dialog-title">{{dialogTitle}}</span>
+            <span fxFlex></span>
+        </mat-toolbar-row>
+    </mat-toolbar>
+
+    <mat-toolbar matDialogTitle class="m-0 mat-primary mat-dialog-title-error" mat-dialog-title *ngIf="tipoMensaje == enumTipoMensaje.ERROR">
+        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+            <span class="title dialog-title">{{dialogTitle}}</span>
+            <span fxFlex></span>
+        </mat-toolbar-row>
+    </mat-toolbar>
+
+    <mat-divider class="-mx-6 text-border"></mat-divider>
+
+    <mat-dialog-content fxLayout="column">
+        <div class="spinner-container" *ngIf="loading">
+            <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+        </div>
+        <div *ngIf="!loading" fxLayout="row" style="font-size: medium;" fxLayoutAlign="start center">
+            <span [innerHTML]="dialogContent"></span>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="center">
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogOk" *ngIf="tipoMensaje !== enumTipoMensaje.ERROR" mat-raised-button type="button" [mat-dialog-close]="true" cdkFocusInitial>Cerrar</button>
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogError" *ngIf="tipoMensaje == enumTipoMensaje.ERROR" mat-raised-button type="button" [mat-dialog-close]="true" cdkFocusInitial>Cerrar</button>
+    </mat-dialog-actions>
+</div>

@@ -1,0 +1,76 @@
+<div class="dropdown">
+    <div class="dropdown-header" fxLayout="row" fxLayoutAlign="space-between center">
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <div class="dropdown-heading-icon" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon [icIcon]="icPerson"></mat-icon>
+        </div>
+        <div class="dropdown-heading">{{dataUsuario.nombres}}</div>
+      </div>
+  
+      <button [matMenuTriggerFor]="settingsMenu" 
+            mat-icon-button
+            matTooltip="Configuración"
+            matTooltipPosition="before"
+            type="button">
+        <mat-icon [icIcon]="icSettings" class="notifications-header-icon"></mat-icon>
+      </button>
+      
+    </div>
+  
+    <div class="dropdown-content">
+      <a (click)="redirect()"
+         *ngFor="let item of items; trackBy: trackById"
+         [routerLink]="item.route"
+         class="notification"
+         fxLayout="row"
+         fxLayoutAlign="start center"
+         matRipple>
+        <mat-icon [icIcon]="item.icon"
+                  [ngClass]="item.colorClass"
+                  class="notification-icon"
+                  fxFlex="none"></mat-icon>
+        <div fxFlex="auto">
+          <div class="notification-label">{{ item.label }}</div>
+          <div class="notification-description">{{ item.description }}</div>
+        </div>
+        <mat-icon [icIcon]="icChevronRight" class="notification-chevron" fxFlex="none"></mat-icon>
+      </a>
+    </div>
+  
+    <div class="dropdown-footer" fxLayout="row" fxLayoutAlign="space-between center">
+      <a (click)="close()" [routerLink]="['/login']" color="primary">Cerrar sesión</a>
+    </div>
+  </div>
+  
+  <mat-menu #statusMenu="matMenu" xPosition="before" yPosition="below">
+    <button (click)="setStatus(status)"
+            *ngFor="let status of statuses; trackBy: trackById"
+            mat-menu-item>
+      <ic-icon [icon]="status.icon" [ngClass]="status.colorClass" inline="true" size="24px"></ic-icon>
+      <span>{{ status.label }}</span>
+    </button>
+  </mat-menu>
+  
+  
+  <mat-menu #settingsMenu="matMenu" xPosition="before" yPosition="below">
+    <button mat-menu-item (click)="configuracionSistema()">
+      <mat-icon [icIcon]="icAssignmentTurnedIn"></mat-icon>
+      <span>Configuración del Sistema</span>
+    </button>
+  
+    <button mat-menu-item (click)="configuracionTiendas()">
+      <mat-icon [icIcon]="icBusiness"></mat-icon>
+      <span>Tiendas Almacenes</span>
+    </button>
+  
+    <button mat-menu-item (click)="configuracionCatalogo()">
+      <mat-icon [icIcon]="icChromeReaderMode"></mat-icon>
+      <span>Catálogos</span>
+    </button>
+  
+    <button mat-menu-item (click)="configuracionRubros()">
+      <mat-icon [icIcon]="icBallot"></mat-icon>
+      <span>Rubros</span>
+    </button>
+  </mat-menu>
+  

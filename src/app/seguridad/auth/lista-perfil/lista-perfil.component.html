@@ -1,0 +1,44 @@
+<div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">{{titulo}}</h2>
+    <!--<button class="text-secondary" mat-dialog-close mat-icon-button type="button" style="color: white;">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>-->
+</div>
+<div class="card ml-8 mr-8 mt-2 mb-8 overflow-auto">
+    <div class="px-2 py-2" fxLayout="column">
+        <p class="mt-0 mb-0 text-secondary">
+            Seleccione un perfil para ingresar al Sistema
+        </p>
+    </div>
+    <div class="px-2 py-2" fxLayout="column">
+        <table class="w-full" style="margin-top: 10px;" [formGroup]="form">
+            <tr>
+                <td style="width: 15%; padding: 5px;">
+                    Perfil
+                </td>
+                <td style="width: 85%; padding: 5px;">
+                    <mat-select formControlName="perfil" >
+                        <mat-option (click)="selectPerfil(option)" *ngFor="let option of perfiles" [value]="option.idperfil">{{option.nombre}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="form.get('perfil').hasError('required')">Seleccione un Perfil</mat-error>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="bg-app-bar px-3 h-16  sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+        <button color="primary" mat-raised-button type="button"
+            style="margin-left: 12px; margin-bottom: 10px; margin-top: 10px;" 
+            (click)="registrarPerfil()" 
+            [class.spinner]="loading"
+            [disabled]="loading"
+            matTooltip="Ingresar al Sistema">
+            <ic-icon [icon]="icCheck"
+                    class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2"
+                    inline="true"
+                    size="24px"></ic-icon>
+            <span>&nbsp;Ingresar al Sistema</span>
+        </button>
+    </div>
+
+</div>

@@ -1,0 +1,178 @@
+<div *ngIf="verBandeja">
+    <vex-secondary-toolbar current="{{itemPrincipal}}" *ngIf="accesoFormulario">
+      <vex-breadcrumbs [crumbs]="['Movimiento de Mercadería']" class="flex-auto"></vex-breadcrumbs>
+      <button class="ml-2" color="primary" mat-icon-button type="button">
+        <mat-icon [icIcon]="icMoreVert"></mat-icon>
+      </button>
+    </vex-secondary-toolbar>
+  
+    <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="!accesoFormulario" class="py-40">
+      <div @fadeInUp fxFlex="auto">
+        <blockquote *ngIf="validandoPermiso" style="margin: 0px; color: #4d4d4d; text-align: center;">
+          Verificando este módulo. Un momento por favor ...
+          <div class="spinner-container" *ngIf="validandoPermiso">
+            <br />
+            <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+            <br />
+          </div>
+        </blockquote>
+        <blockquote *ngIf="!validandoPermiso" style="margin: 0px; color: #4d4d4d; text-align: center;">
+          Ud. no tiene permisos para acceder a este módulo.
+        </blockquote>
+      </div>
+    </div>
+
+    <vex-page-layout *ngIf="accesoFormulario">
+        <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+        <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+          [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+          <div class="card overflow-auto -mt-16">
+    
+            <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+              <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+                <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                  <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                </span>
+                <span @fadeInRight class="block">Listado de Ingresos de Mercadería x Orden de Compra</span>
+              </h2>
+              <span fxFlex></span>
+              <button (click)="ingresarCompra()" class="ml-4" color="primary" fxFlex="none" mat-mini-fab
+                matTooltip="Ingresar Compra" type="button" *ngIf="btnNuevo">
+                <mat-icon [icIcon]="icAdd"></mat-icon>
+              </button>
+            </div>
+    
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" [formGroup]="form" *ngIf="accesoFormulario">
+              <div class="card" fxFlex="auto">
+    
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>N° Ingreso</mat-label>
+                      <input formControlName="numIngreso" matInput maxlength="10">
+                    </mat-form-field>
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>N° Compra</mat-label>
+                      <input formControlName="numCompra" matInput maxlength="10">
+                    </mat-form-field>
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Filtrar por:</mat-label>
+                      <mat-select formControlName="filtroBusk" (selectionChange)="cambiaFiltroBusk()">
+                        <mat-option *ngFor="let option of filtro" [value]="option.valor">{{option.valor}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <div class="mb-5" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                      <button class="bg-botones-principal text-white mt-3 mb-3" matTooltip="Buscar Compra"
+                        (click)="listaIngresos(pagina)" mat-raised-button type="button">
+                        <ic-icon [icon]="icSearch" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="20px">
+                        </ic-icon>
+                        <span>Buscar</span>
+                      </button>
+                      <button class="bg-botones-principal text-white mt-3 mb-3" matTooltip="Regresar Pantalla Principal"
+                        (click)="irBandejaPrincipal()" mat-raised-button type="button">
+                        <ic-icon [icon]="icReturn" class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2" inline="true" size="20px">
+                        </ic-icon>
+                        <span>Regresar</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+    
+                <div class="spinner-container" *ngIf="loadingIngresos">
+                  <br /><br />
+                  <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                  <br /><br />
+                </div>
+    
+                <table [dataSource]="dataSource" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingIngresos">
+                  <ng-container matColumnDef="correlativo">
+                    <th mat-header-cell *matHeaderCellDef width="5%">#</th>
+                    <td mat-cell *matCellDef="let element; let i = index">
+                      {{ i + 1 + numeracion}}-
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="numero">
+                    <th mat-header-cell *matHeaderCellDef width="15%">Número</th>
+                    <td mat-cell *matCellDef="let element;">
+                      <p class="indicadorNuevo">Ingreso: <b>{{ llenaCeros(element.idmovimiento,8) }}</b></p>
+                      <p class="indicadorNuevo">Compra: <b>{{ llenaCeros(element.idtabla,8) }}</b></p>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="proveedor">
+                    <th mat-header-cell *matHeaderCellDef width="20%">Proveedor</th>
+                    <td mat-cell *matCellDef="let element;">
+                      {{ element.representante }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="datos">
+                    <th mat-header-cell *matHeaderCellDef width="25%">Información</th>
+                    <td mat-cell *matCellDef="let element;">
+                      Recibe: {{ element.tiendadestino }}<br>
+                      F. Ingreso: {{ element.fechaingreso | date: "dd/MM/yyyy"}}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="estado">
+                    <th mat-header-cell *matHeaderCellDef width="15%">Estado</th>
+                    <td mat-cell *matCellDef="let element;">
+                      {{ element.estadomovimiento }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="importe">
+                    <th mat-header-cell *matHeaderCellDef width="10%" class="text-right">Importe</th>
+                    <td mat-cell *matCellDef="let element;" class="text-right">
+                      {{ element.montototal | currency: " S/."}}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="accion">
+                    <th mat-header-cell *matHeaderCellDef width="10%">Acción</th>
+                    <td mat-cell *matCellDef="let element; let i = index">
+                      <div class="accionBtn">
+                        <button class="bg-botones-principal" fxHide.xs [disabled]="habilitaBtnReg"
+                          [class.spinner]="spinBtnReg" matTooltip="Modificar Ingreso" style="margin-right: 6px;"
+                          (click)="editarMovimiento(element)"  mat-mini-fab type="button" *ngIf="btnModificar && (element.idestadomovimiento == estadoEnproceso)">
+                          <ic-icon [icon]="icEdit" inline="true" size="20px"></ic-icon>
+                        </button>
+                        <button class="bg-botones-principal" fxHide.xs [disabled]="habilitaBtnReg"
+                          [class.spinner]="spinBtnReg" matTooltip="Ver Ingreso" style="margin-right: 6px;"
+                          (click)="editarMovimiento(element)"  mat-mini-fab type="button" *ngIf="(element.idestadomovimiento !== estadoEnproceso)">
+                          <ic-icon [icon]="icSearch" inline="true" size="20px"></ic-icon>
+                        </button>
+                        <button class="bg-botones-secundario" fxHide.xs [disabled]="habilitaBtnReg" 
+                          [class.spinner]="spinBtnReg" matTooltip="Eliminar Ingreso" style="margin-right: 6px;" 
+                          (click)="eliminarMovimiento(element)" mat-mini-fab type="button" *ngIf="btnEliminar && (element.idestadomovimiento == estadoEnproceso)">
+                          <ic-icon [icon]="icDelete" inline="true" size="20px"></ic-icon>
+                        </button>
+                      </div>
+                    </td>
+                  </ng-container>
+                  <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                  <tr *matRowDef="let row; columns: displayedColumns;" @fadeInUp
+                    class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                </table>
+                <div *ngIf="dataSource?.data?.length===0" class="no-records">
+                  <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                    <div class="mt-0 mb-0 text-secondary">No existen iformación registrada en este momento.
+                    </div>
+                  </div>
+                </div>
+                <!--PAGINACIÓN-->
+                <mat-paginator [hidePageSize]="true" [length]="totalRegistros" [pageIndex]="pageIndex" class="sticky left-0"
+                  [pageSize]="totalRegistrosPorPagina" (page)="listarPorPagina($event)" showFirstLastButtons>
+                </mat-paginator>
+    
+              </div>
+    
+            </div>
+    
+          </div>
+    
+        </vex-page-layout-content>
+    </vex-page-layout>
+</div>
+
+<div *ngIf="verFormulario" >
+    <vex-ingreso-compra-formulario (verBandejaIngreso)="irBandeja()" [datosIngreso]="datosIngreso"></vex-ingreso-compra-formulario>
+</div>
+    
+    

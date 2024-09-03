@@ -1,0 +1,89 @@
+<form [formGroup]="form">
+    <div fxLayout="row" class="mat-dialog-title" fxLayoutAlign="start center" mat-dialog-title>
+        <h2 class="headline ml-4" fxFlex="auto">{{tituloForm}}</h2>
+        <button class="text-secondary" mat-dialog-close mat-icon-button type="button" 
+            (click)="cerrarVentana(null)" style="color: white;">
+            <mat-icon [icIcon]="icClose"></mat-icon>
+        </button>
+    </div>
+    <mat-divider class="-mx-6 text-border"></mat-divider>
+
+    <mat-dialog-content fxLayout="column">
+        <div class="flex flex-col sm:flex-row">
+            <mat-form-field class="flex-auto">
+                <mat-label>Opción Principal:</mat-label>
+                <mat-select formControlName="opcionPadre">
+                    <mat-option *ngFor="let option of listaOpcionPadre" [value]="option.idopcion">{{option.nombre}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="form.get('opcionPadre').hasError('required')">Seleccione una opción</mat-error>
+            </mat-form-field>
+            <mat-checkbox class="mt-4" formControlName="habilitador"
+                (change)="desHabilTipoEnlace($event)">
+                Deshabilitar
+            </mat-checkbox>
+        </div>
+
+        <mat-form-field class="flex-auto">
+            <mat-label>Opción</mat-label>
+            <input matInput maxlength="250" formControlName="nombre" required>
+            <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese el nombre de la Opción</mat-hint>
+            <mat-error *ngIf="form.get('nombre').hasError('required')">Ingrese el nombre de la Opción</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="flex-auto">
+            <mat-label>Abreviatura</mat-label>
+            <input matInput maxlength="250" formControlName="abreviatura" required>
+            <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese una abreviatura</mat-hint>
+            <mat-error *ngIf="form.get('abreviatura').hasError('required')">Ingrese una abreviatura</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="flex-auto" *ngIf="itemEnlace">
+            <mat-label>Enlace</mat-label>
+            <input matInput maxlength="250" formControlName="enlace" required>
+            <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese un enlace</mat-hint>
+            <mat-error *ngIf="form.get('enlace').hasError('required')">Ingrese un enlace</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="flex-auto" *ngIf="itemIcono">
+            <mat-label>ícono:</mat-label>
+            <mat-select formControlName="icono">
+                <mat-option *ngFor="let option of lstIconosMenu" [value]="option.icon">{{option.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('icono').hasError('required')">Seleccione un ícono</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="flex-auto">
+            <mat-label>Destino:</mat-label>
+            <mat-select formControlName="destino">
+                <mat-option *ngFor="let option of lstDestino" [value]="option.id">{{option.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('destino').hasError('required')">Seleccione una opción</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="flex-auto">
+            <mat-label>Ver Opción:</mat-label>
+            <mat-select formControlName="veropcion">
+                <mat-option *ngFor="let option of lsVerOpcion" [value]="option.id">{{option.name}}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('veropcion').hasError('required')">Seleccione una opción</mat-error>
+        </mat-form-field>
+    </mat-dialog-content>
+
+    <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogNO" 
+            mat-raised-button type="button" (click)="cerrarVentana(null)">Cancelar
+        </button>
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogOk" 
+            [disabled]="habilitaBtnReg"
+            [class.spinner]="spinBtnReg"
+            mat-raised-button type="button" (click)="RegistrarOpcion()">{{btnRegistro}}
+        </button>
+    </div>
+</form>

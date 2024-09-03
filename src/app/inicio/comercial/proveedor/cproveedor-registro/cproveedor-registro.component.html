@@ -1,0 +1,64 @@
+<form [formGroup]="form">
+    <div fxLayout="row" class="mat-dialog-title" fxLayoutAlign="start center" mat-dialog-title>
+      <h2 class="headline ml-4" fxFlex="auto">{{tituloForm}}</h2>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" (click)="cerrarVentana(null)"
+        style="color: white;">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </div>
+    <mat-divider class="-mx-6 text-border"></mat-divider>
+  
+    <mat-dialog-content fxLayout="column">
+        <mat-form-field class="flex-auto">
+            <mat-label>Proveedor</mat-label>
+            <input matInput maxlength="250" class="uppercase" formControlName="nombre" required>
+            <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese el nombre del proveedor</mat-hint>
+            <mat-error *ngIf="form.get('nombre').hasError('required')">Ingrese el nombre del proveedor</mat-error>
+        </mat-form-field>
+        <mat-form-field class="flex-auto">
+            <mat-label>RUC</mat-label>
+            <input matInput maxlength="12" class="uppercase" 
+                formControlName="ruc" vexDirectivasComercial [entrada]='tipoEntradaNumero'>
+            <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese un RUC</mat-hint>
+            <mat-error *ngIf="form.get('ruc').hasError('required')">Ingrese un RUC</mat-error>
+        </mat-form-field>
+        <mat-form-field class="mt-6 flex-auto">
+            <mat-label>Dirección</mat-label>
+            <input matInput maxlength="250" class="uppercase" formControlName="direccion">
+            <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese una dirección</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="mt-6" fxFlex="50">
+            <mat-label>Teléfono</mat-label>
+            <input matInput maxlength="250" class="uppercase"
+                formControlName="telefono" vexDirectivasComercial [entrada]='tipoEntradaNumero'>
+            <mat-icon [icIcon]="icPhone" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese un número de teléfono</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="mt-6 flex-auto">
+            <mat-label>E-mail</mat-label>
+            <input matInput maxlength="150" formControlName="email">
+            <mat-icon [icIcon]="icMail" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese un correo electrónico</mat-hint>
+            <mat-error *ngIf="form.get('email').hasError('pattern')">Ingrese un correo válido</mat-error>
+        </mat-form-field>
+        <mat-form-field class="mt-6 flex-auto">
+            <mat-label>Web</mat-label>
+            <input matInput maxlength="250" class="uppercase" formControlName="web">
+            <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+            <mat-hint align="start">Ingrese una dirección web</mat-hint>
+        </mat-form-field>
+    </mat-dialog-content>
+  
+    <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+      <button class="mat-focus-indicator mat-button mat-button-base mat-dialogNO" mat-raised-button type="button"
+        (click)="cerrarVentana(null)">Cancelar
+      </button>
+      <button class="mat-focus-indicator mat-button mat-button-base mat-dialogOk" [disabled]="habilitaBtnReg"
+        [class.spinner]="spinBtnReg" mat-raised-button type="button" (click)="RegistrarProveedor()">{{btnRegistro}}
+      </button>
+    </div>
+  </form>
+  

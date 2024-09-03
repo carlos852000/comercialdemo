@@ -1,0 +1,64 @@
+<form [formGroup]="form">
+    <div fxLayout="row" class="mat-dialog-title" fxLayoutAlign="start center" mat-dialog-title>
+        <h2 class="headline ml-4" fxFlex="auto">{{tituloForm}}</h2>
+        <button class="text-secondary" mat-dialog-close mat-icon-button type="button" 
+            (click)="cerrarVentana(null)" style="color: white;">
+            <mat-icon [icIcon]="icClose"></mat-icon>
+        </button>
+    </div>
+    <mat-divider class="-mx-6 text-border"></mat-divider>
+
+    <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+    <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+        [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+        <div class="card overflow-auto -mt-16">
+
+            <!--BANDEJA DE INFORMACIÓN-->
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" [formGroup]="form">
+                <div class="card" fxFlex="auto">
+
+                    <div class="spinner-container" *ngIf="loadingPerfiles">
+                        <br /><br />
+                        <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+                        <br /><br />
+                    </div>
+
+                    <!--TABLA DE DATOS-->
+                    <table [dataSource]="dataSource" class="w-full mat-table-main" mat-table matSort *ngIf="!loadingPerfiles">
+                        <ng-container matColumnDef="correlativo">
+                            <th mat-header-cell *matHeaderCellDef width="10%">#</th>
+                            <td mat-cell *matCellDef="let element; let i = index" >
+                                {{ i + 1 + numeracion}}-
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="perfil">
+                            <th mat-header-cell *matHeaderCellDef width="90%">Opción</th>
+                            <td mat-cell *matCellDef="let element;" [formGroupName]="'group-' + element.idperfil">
+                                <mat-checkbox formControlName="activecheck" (change)="
+                                isSelectedCheck($event, element.idperfil)">
+                                </mat-checkbox>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span [innerHTML]="element.nombre"></span>
+                            </td>
+                        </ng-container>
+                        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                        <tr *matRowDef="let row; columns: displayedColumns;" @fadeInUp
+                            class="hover:bg-hover trans-ease-out cursor-pointer" mat-row></tr>
+                    </table>
+                    <div *ngIf="dataSource?.data?.length===0" class="no-records">
+                        <div class="px-3 py-6 h-8 sticky left-0" fxLayout="row" fxLayoutAlign="center center">
+                            <div class="mt-0 mb-0 text-secondary">No existen iformación registrada en este momento.
+                            </div>
+                        </div>
+                    </div>
+                    <!--PAGINACIÓN-->
+                    <mat-paginator [hidePageSize]="true" [length]="totalRegistros" [pageIndex]="pageIndex" class="sticky left-0"
+                        [pageSize]="totalRegistrosPorPagina" (page)="listarPorPagina($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                    <!--TABLA DE DATOS-->
+
+                </div>
+            </div>
+        </div>
+    </vex-page-layout-content>
+</form>

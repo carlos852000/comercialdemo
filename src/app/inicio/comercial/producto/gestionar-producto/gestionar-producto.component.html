@@ -1,0 +1,539 @@
+<vex-secondary-toolbar current="{{itemPrincipal}}" *ngIf="accesoFormulario">
+  <vex-breadcrumbs [crumbs]="['Productos / Gestión de Producto']" class="flex-auto"></vex-breadcrumbs>
+  <button class="ml-2" color="primary" mat-icon-button type="button">
+    <mat-icon [icIcon]="icMoreVert"></mat-icon>
+  </button>
+</vex-secondary-toolbar>
+<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="!accesoFormulario" class="py-40">
+  <div @fadeInUp fxFlex="auto">
+    <blockquote *ngIf="validandoPermiso"
+      style="margin: 0px; background-color: #e3e3e3; color: #575757; text-align: center;">
+      Verificando este módulo. Un momento por favor ...
+    </blockquote>
+    <blockquote *ngIf="!validandoPermiso"
+      style="margin: 0px; background-color: #e3e3e3; color: #575757; text-align: center;">
+      Ud. no tiene permisos para acceder a este módulo.
+    </blockquote>
+  </div>
+</div>
+
+<vex-page-layout *ngIf="accesoFormulario">
+  <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+  <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+    [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+    <div class="card overflow-auto -mt-16">
+
+      <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+        <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+          <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+            <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+          </span>
+          <!--@fadeInRight-->
+          <span class="block">{{tituloForm}}</span>
+        </h2>
+        <span fxFlex></span>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="accesoFormulario">
+
+        <div class="card" fxFlex="auto" *ngIf="loadingProductos">
+          <div class="spinner-container">
+            <br /><br />
+            <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+            <br /><br />
+          </div>
+        </div>
+
+        <div class="card" fxFlex="auto" *ngIf="!loadingProductos">
+          <mat-tab-group [selectedIndex]="0">
+            <mat-tab label="Información del Producto" [formGroup]="formProducto">
+
+              <div fxLayout="column" class="margenesForms">
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="50">
+                      <mat-label>Nombre de Producto</mat-label>
+                      <input formControlName="nombreProducto" matInput maxlength="255" minlength="3" required>
+                      <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese los datos del producto</mat-hint>
+                      <mat-error *ngIf="formProducto.get('nombreProducto').hasError('required')">Ingrese los datos del
+                        producto</mat-error>
+                    </mat-form-field>
+                    <!--<mat-form-field fxFlex="50">
+                      <mat-label>Unidad de Medida</mat-label>
+                      <input [formControl]="umedida" [matAutocomplete]="auto" matInput>
+                      <mat-autocomplete #auto="matAutocomplete" [displayWith]="getTitleUMedida.bind(this)">
+                        <mat-option *ngFor="let option of filteredUnidadMedida | async" [value]="option">
+                          {{option.descripcion}}  ({{option.cantidad}})
+                        </mat-option>
+                      </mat-autocomplete>
+                    </mat-form-field>-->
+
+                    <mat-form-field fxFlex="50">
+                      <mat-label>Unidad de Medida</mat-label>
+                      <mat-select formControlName="unidadMedida" required [class.spinner]="habilitaCboUM"
+                        [disabled]="habilitaCboUM">
+                        <mat-option [value]="0">Seleccione una opcion</mat-option>
+                        <mat-option *ngFor="let option of lstUnidadMedida" [value]="option.idrubrounidadmedida">
+                          {{option.descripcion}} ({{option.cantidad}})
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint align="start">Selecciona una Unidad de Medida</mat-hint>
+                      <mat-error *ngIf="formProducto.get('unidadMedida').hasError('required')">Selecciona una Unidad de
+                        Medida</mat-error>
+                    </mat-form-field>
+
+                    <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab matTooltip="Registrar Edades"
+                      type="button">
+                      <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(1)"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <hr>
+                <div fxLayout="column" *ngIf="datosConfiguracion?.indicadordesagregarproducto == 1">
+                  <div class="mt-0 border-b" fxLayout="row" fxLayoutAlign="start center">
+                    <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                      <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <h3 class="subtitle m-0 block">Desagregación de productos</h3>
+                  </div>
+                  <span fxFlex></span>
+                </div>
+                <div class="px-2 py-2" fxLayout="column" *ngIf="datosConfiguracion?.indicadordesagregarproducto == 1">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <div fxFlex="50">
+                      <p class="mt-0 mb-2 text-secondary">¿Desea desagregar este producto?</p>
+                      <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="desagregar"
+                        class="example-radio-group">
+                        <mat-radio-button value="1" class="example-radio-button" (click)="desagregaProductos(1)">SI
+                        </mat-radio-button>
+                        <mat-radio-button value="0" class="example-radio-button" (click)="desagregaProductos(0)">NO
+                        </mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+                    <div fxFlex="50" *ngIf="desagregado==1">
+                      <button color="primary" mat-raised-button type="button" [disabled]="!idProductoRegistrado"
+                        [class.spinner]="spinBtnReg" (click)="CargarProductosDesagregados()">
+                        <mat-icon>add_circle</mat-icon>
+                        Registrar Productos Desagregados
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <hr>
+                <div fxLayout="column">
+                  <div class="mt-0 border-b" fxLayout="row" fxLayoutAlign="start center">
+                    <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                      <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <h3 class="subtitle m-0 block">Códigos del Producto</h3>
+                  </div>
+                  <span fxFlex></span>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto" *ngIf="datosConfiguracion?.codigoproductointerno == 1">
+                      <mat-label>Código Interno</mat-label>
+                      <input formControlName="codigoInterno" matInput maxlength="255" minlength="3">
+                      <mat-icon [icIcon]="icpCodigo" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese un código interno</mat-hint>
+                      <mat-error *ngIf="formProducto.get('codigoInterno').hasError('required')">Ingrese un código
+                        interno</mat-error>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Código de Barras</mat-label>
+                      <input formControlName="codigoBarras" matInput maxlength="255" minlength="3">
+                      <mat-icon [icIcon]="icpCodigo" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese un código de barras</mat-hint>
+                      <mat-error *ngIf="formProducto.get('codigoBarras').hasError('required')">Ingrese un código de
+                        barras</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <hr>
+                <div fxLayout="column">
+                  <div class="mt-6 border-b" fxLayout="row" fxLayoutAlign="start center">
+                    <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                      <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <h3 class="subtitle m-0 block">Características del Producto</h3>
+                  </div>
+                  <span fxFlex></span>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Edades</mat-label>
+                      <mat-select formControlName="edades" multiple="true" [class.spinner]="habilitaCboEdades"
+                        [disabled]="habilitaCboEdades">
+                        <mat-option *ngFor="let option of lstEdades" [value]="option.idrubrocaracteristicadetalle">
+                          {{option.nombre}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint align="start">Seleccione una opción</mat-hint>
+                      <mat-error *ngIf="formProducto.get('edades').hasError('required')">Seleccione una opción
+                      </mat-error>
+                    </mat-form-field>
+
+                    <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab matTooltip="Registrar Edades"
+                      type="button">
+                      <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(2)"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Modelo</mat-label>
+                      <mat-select formControlName="modelo" multiple="true" [class.spinner]="habilitaCboModelo"
+                        [disabled]="habilitaCboModelo">
+                        <mat-option *ngFor="let option of lstModelo" [value]="option.idrubrocaracteristicadetalle">
+                          {{option.nombre}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint align="start">Seleccione una opción</mat-hint>
+                      <mat-error *ngIf="formProducto.get('modelo').hasError('required')">Seleccione una opción
+                      </mat-error>
+                    </mat-form-field>
+
+                    <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab matTooltip="Registrar Modelos"
+                      type="button">
+                      <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(3)"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto" appearance="fill">
+                      <mat-label>Familia</mat-label>
+                      <mat-select formControlName="familia" multiple="true" [class.spinner]="habilitaCboFamilia"
+                        [disabled]="habilitaCboFamilia">
+                        <mat-option *ngFor="let option of lstFamilia" [value]="option.idrubrocaracteristicadetalle">
+                          {{option.nombre}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint align="start">Seleccione una opción</mat-hint>
+                      <mat-error *ngIf="formProducto.get('familia').hasError('required')">Seleccione una opción
+                      </mat-error>
+                    </mat-form-field>
+
+                    <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab matTooltip="Registrar Modelos"
+                      type="button">
+                      <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(4)"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Genero</mat-label>
+                      <mat-select formControlName="genero" multiple="true" [class.spinner]="habilitaCboGenero"
+                        [disabled]="habilitaCboGenero">
+                        <mat-option *ngFor="let option of lstGenero" [value]="option.idrubrocaracteristicadetalle">
+                          {{option.nombre}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint align="start">Seleccione una opción</mat-hint>
+                      <mat-error *ngIf="formProducto.get('genero').hasError('required')">Seleccione una opción
+                      </mat-error>
+                    </mat-form-field>
+
+                    <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab matTooltip="Registrar Modelos"
+                      type="button">
+                      <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(5)"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <hr>
+                <div fxLayout="column">
+                  <div class="mt-6 border-b" fxLayout="row" fxLayoutAlign="start center">
+                    <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                      <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <h3 class="subtitle m-0 block">Información General</h3>
+                  </div>
+                  <span fxFlex></span>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Proveedor</mat-label>
+                      <mat-select formControlName="proveedor" required [class.spinner]="habilitaCboProveed"
+                        [disabled]="habilitaCboProveed">
+                        <mat-option [value]="0">Seleccione una opcion</mat-option>
+                        <mat-option *ngFor="let option of lstProveedor" [value]="option.idproveedor">
+                          {{option.representante}}
+                          | {{option.ruc}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint align="start">Seleccione una opción</mat-hint>
+                      <mat-error *ngIf="formProducto.get('proveedor').hasError('required')">Seleccione una opción
+                      </mat-error>
+                    </mat-form-field>
+                    <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab
+                      matTooltip="Registrar Proveedor" type="button">
+                      <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(6)"></mat-icon>
+                    </button>
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Marca</mat-label>
+                      <mat-select formControlName="marca" required [class.spinner]="habilitaCboMarca"
+                        [disabled]="habilitaCboMarca">
+                        <mat-option [value]="0">Seleccione una opcion</mat-option>
+                        <mat-option *ngFor="let option of lstMarcas" [value]="option.idcatalogodetalle">
+                          {{option.descripcion}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint align="start">Seleccione una opción</mat-hint>
+                      <mat-error *ngIf="formProducto.get('marca').hasError('required')">Seleccione una opción
+                      </mat-error>
+                    </mat-form-field>
+                    <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab matTooltip="Registrar Modelos"
+                      type="button">
+                      <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(7)"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>% de Utilidad</mat-label>
+                      <input formControlName="porcentanjeUtilidad" matInput maxlength="5" minlength="1" required
+                        vexDirectivasComercial [entrada]='tipoEntradaMoneda'>
+                      <mat-icon [icIcon]="icReceipt" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese el porcentaje de utilidad</mat-hint>
+                      <mat-error *ngIf="formProducto.get('porcentanjeUtilidad').hasError('required')">Ingrese el
+                        porcentaje de utilidad</mat-error>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Cantidad</mat-label>
+                      <input formControlName="cantidad" class="pcostoNuevo" matInput maxlength="5" minlength="1"
+                        required vexDirectivasComercial [entrada]='tipoEntradaNumero'>
+                      <mat-icon [icIcon]="icReceipt" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese una cantidad</mat-hint>
+                      <mat-error *ngIf="formProducto.get('cantidad').hasError('required')">Ingrese una cantidad
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="50">
+                      <mat-label>Cantidad Min. Compra</mat-label>
+                      <input formControlName="cantidadMinimaCompra" matInput maxlength="5" minlength="1" required
+                        vexDirectivasComercial [entrada]='tipoEntradaNumero'>
+                      <mat-icon [icIcon]="icReceipt" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese una cantidad</mat-hint>
+                      <mat-error *ngIf="formProducto.get('cantidadMinimaCompra').hasError('required')">Ingrese una
+                        cantidad</mat-error>
+                    </mat-form-field>
+
+                    <div fxFlex="50">
+                      <p class="mt-0 mb-2 text-secondary">¿Activo para compra?</p>
+                      <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="activoCompra"
+                        class="example-radio-group">
+                        <mat-radio-button value="0" class="example-radio-button">SI</mat-radio-button>
+                        <mat-radio-button value="1" class="example-radio-button">NO</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="50">
+                      <mat-label>Cantidad Min. Venta</mat-label>
+                      <input formControlName="cantidadMinimaVenta" matInput maxlength="5" minlength="1" required
+                        vexDirectivasComercial [entrada]='tipoEntradaNumero'>
+                      <mat-icon [icIcon]="icReceipt" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese una cantidad</mat-hint>
+                      <mat-error *ngIf="formProducto.get('cantidadMinimaVenta').hasError('required')">Ingrese una
+                        cantidad</mat-error>
+                    </mat-form-field>
+
+                    <div fxFlex="50">
+                      <p class="mt-0 mb-2 text-secondary">¿Activo para venta?</p>
+                      <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="activoVenta"
+                        class="example-radio-group">
+                        <mat-radio-button value="0" class="example-radio-button">SI</mat-radio-button>
+                        <mat-radio-button value="1" class="example-radio-button">NO</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                <button color="dark" mat-raised-button type="button" (click)="Cancelar()">Cancelar</button>
+                <button color="primary" mat-raised-button type="button" [disabled]="habilitaBtnReg"
+                  [class.spinner]="spinBtnReg" (click)="RegistrarProducto()">
+                  <mat-icon>save</mat-icon>
+                  Guardar
+                </button>
+              </div>
+
+            </mat-tab>
+
+            <mat-tab label="Precios del Producto" *ngIf="idProductoRegistrado" [formGroup]="formProductoPrecio">
+              <div fxLayout="column" class="margenesForms">
+
+                <div class="px-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto" appearance="fill">
+                      <mat-label>Nombre de Producto</mat-label>
+                      <input formControlName="nombreProducto" matInput maxlength="255" minlength="3" [readonly]="true">
+                      <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                      <!--<mat-hint align="start">Información del producto</mat-hint>-->
+                    </mat-form-field>
+                  </div>
+                </div>
+                <hr>
+
+                <div fxLayout="column">
+                  <div class="mt-0 border-b" fxLayout="row" fxLayoutAlign="start center">
+                    <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                      <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+                    </span>
+                    <h3 class="subtitle m-0 block">Precios de Venta</h3>
+                  </div>
+                  <span fxFlex></span>
+                </div>
+
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Precio de Costo Nuevo</mat-label>
+                      <input formControlName="preciocostoNuevo" class="pcostoNuevo" matInput maxlength="10"
+                        minlength="1" required [readonly]="true" vexDirectivasComercial [entrada]='tipoEntradaMoneda'>
+                      <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                      <!--<mat-hint align="start">Ingrese los datos del producto</mat-hint>
+                      <mat-error *ngIf="formProducto.get('preciocostoNuevo').hasError('required')">Ingrese los datos del producto</mat-error>-->
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Precio de Costo</mat-label>
+                      <input formControlName="preciocosto" matInput maxlength="10" minlength="1" required
+                        vexDirectivasComercial [entrada]='tipoEntradaMoneda' (keyup)="getCalculaPrecio(1)">
+                      <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese un precio</mat-hint>
+                      <mat-error *ngIf="formProductoPrecio.get('preciocosto').hasError('required')">Ingrese un precio
+                      </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>% de Utilidad</mat-label>
+                      <input formControlName="porcentanjeUtilidad" matInput maxlength="5" minlength="1" required
+                        vexDirectivasComercial [entrada]='tipoEntradaMoneda' (keyup)="getCalculaPrecio(2)">
+                      <mat-icon [icIcon]="icReceipt" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese el porcentaje de utilidad</mat-hint>
+                      <mat-error *ngIf="formProductoPrecio.get('porcentanjeUtilidad').hasError('required')">Ingrese el
+                        porcentaje de utilidad</mat-error>
+                    </mat-form-field>
+
+                  </div>
+                </div>
+
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Precio (imp. excl.)</mat-label>
+                      <input formControlName="preciosinimp" matInput maxlength="10" minlength="1" required
+                        vexDirectivasComercial [entrada]='tipoEntradaMoneda' (keyup)="getCalculaPrecio(3)">
+                      <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese un precio</mat-hint>
+                      <mat-error *ngIf="formProductoPrecio.get('preciosinimp').hasError('required')">Ingrese un precio
+                      </mat-error>
+                    </mat-form-field>
+
+                    <div class="sm:mt-2 sm:ml-6 flex-auto">
+                      <p class="mt-0 mb-0 text-secondary">
+                        % de impuestos
+                      </p>
+                      <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="porcentImpuesto">
+                        <mat-radio-button value="0" (click)="porcentajeImpuesto(0)">Sin Impuestos</mat-radio-button>
+                        <mat-radio-button value="1" *ngIf="datosConfiguracion.igv" (click)="porcentajeImpuesto(1)">
+                          {{datosConfiguracion.igv}}%</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Precio (imp. incl.)</mat-label>
+                      <input formControlName="precioconimp" matInput maxlength="10" minlength="1" required
+                        vexDirectivasComercial [entrada]='tipoEntradaMoneda' (keyup)="getCalculaPrecio(5)">
+                      <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese un precio</mat-hint>
+                      <mat-error *ngIf="formProductoPrecio.get('precioconimp').hasError('required')">Ingrese un precio
+                      </mat-error>
+                    </mat-form-field>
+
+                  </div>
+                </div>
+
+                <div class="px-2 py-2" fxLayout="column">
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Unidad de Medida</mat-label>
+                      <mat-select formControlName="unidadMedida" required [class.spinner]="habilitaCboUM"
+                        [disabled]="habilitaCboUM">
+                        <mat-option [value]="0">Seleccione una opcion</mat-option>
+                        <mat-option *ngFor="let option of lstUnidadMedida" [value]="option.idrubrounidadmedida"
+                          (click)="getUnidadMedida(option)">{{option.descripcion}} ({{option.cantidad}})
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint align="start">Selecciona una Unidad de Medida</mat-hint>
+                      <mat-error *ngIf="formProductoPrecio.get('unidadMedida').hasError('required')">Selecciona una
+                        Unidad de Medida</mat-error>
+                    </mat-form-field>
+                    <button class="mr-4 my-2" color="primary" fxFlex="none" mat-mini-fab matTooltip="Registrar Edades"
+                      type="button">
+                      <mat-icon [icIcon]="icAdd" (click)="openModalCatalogo(1)"></mat-icon>
+                    </button>
+                    <mat-form-field fxFlex="auto">
+                      <mat-label>Precio Unitario</mat-label>
+                      <input formControlName="preciounitario" class="punitario" matInput maxlength="9" minlength="1"
+                        required [readonly]="true" vexDirectivasComercial [entrada]='tipoEntradaMoneda'>
+                      <mat-icon [icIcon]="icMoney" matPrefix></mat-icon>
+                      <mat-hint align="start">Ingrese el precio unitario</mat-hint>
+                      <mat-error *ngIf="formProductoPrecio.get('preciounitario').hasError('required')">Ingrese el precio
+                        unitario</mat-error>
+                    </mat-form-field>
+                    <mat-checkbox class="mt-4" formControlName="redondeo" (change)="redondearPrecio($event)">
+                      Redondear
+                    </mat-checkbox>
+                  </div>
+                </div>
+
+              </div>
+              <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                <button color="dark" mat-raised-button type="button" (click)="Cancelar()">Cancelar</button>
+                <button class="bg-botones-alterno" mat-raised-button type="button" [disabled]="habilitaBtnReg"
+                  [class.spinner]="spinBtnReg" (click)="verHistorialPrecios()">
+                  <mat-icon>query_stats</mat-icon>
+                  Historial
+                </button>
+                <button color="primary" mat-raised-button type="button" [disabled]="habilitaBtnReg"
+                  [class.spinner]="spinBtnReg" (click)="RegistrarProductoPrecio()">
+                  <mat-icon>save</mat-icon>
+                  Guardar
+                </button>
+              </div>
+
+            </mat-tab>
+
+            <mat-tab label="Listado de Precios Específicos" *ngIf="idProductoRegistrado">
+              <div fxLayout="column" class="margenesForms">
+
+                <vex-listar-producto-precio-grupo (verBandejaPrincipal)="Cancelar()" [datosProducto]="datosProducto">
+                </vex-listar-producto-precio-grupo>
+
+              </div>
+            </mat-tab>
+
+          </mat-tab-group>
+
+        </div>
+      </div>
+
+    </div>
+
+  </vex-page-layout-content>
+</vex-page-layout>

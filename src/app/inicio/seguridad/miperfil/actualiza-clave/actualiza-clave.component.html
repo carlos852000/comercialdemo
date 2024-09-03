@@ -1,0 +1,43 @@
+<form [formGroup]="form">
+    <div fxLayout="row" class="mat-dialog-title" fxLayoutAlign="start center" mat-dialog-title>
+        <h2 class="headline ml-4" fxFlex="auto">{{tituloForm}}</h2>
+        <button class="text-secondary" mat-dialog-close mat-icon-button type="button" 
+            (click)="cerrarVentana(null)" style="color: white;">
+            <mat-icon [icIcon]="icClose"></mat-icon>
+        </button>
+    </div>
+    <mat-divider class="-mx-6 text-border"></mat-divider>
+
+    <mat-dialog-content fxLayout="column">
+        <div class="flex flex-col sm:flex-row">
+            <mat-form-field class="mt-2 flex-auto">
+                <mat-label>Contraseña</mat-label>
+                <input [type]="inputType" matInput formControlName="clavenum1" required>
+                <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+                <mat-hint align="start">Ingrese una contraseña</mat-hint>
+                <mat-error *ngIf="form.get('clavenum1').hasError('required')">Ingrese una contraseña</mat-error>
+            </mat-form-field>
+        </div>
+        <div class="flex flex-col sm:flex-row">
+            <mat-form-field class="mt-2 flex-auto">
+                <mat-label>Vuelva a ingresar su Contraseña</mat-label>
+                <input [type]="inputType" matInput formControlName="clavenum2" required>
+                <mat-icon [icIcon]="icDni" matPrefix></mat-icon>
+                <mat-hint align="start">Ingrese una contraseña</mat-hint>
+                <mat-error *ngIf="form.get('clavenum2').hasError('required')">Ingrese una contraseña</mat-error>
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+
+    <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogNO" 
+            mat-raised-button type="button" (click)="cerrarVentana(null)">Cancelar
+        </button>
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogOk" 
+            [disabled]="habilitaBtnReg"
+            [class.spinner]="spinBtnReg"
+            mat-raised-button type="button" (click)="ActualizaClave()">Actualizar
+        </button>
+    </div>
+    
+</form>

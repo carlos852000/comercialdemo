@@ -1,0 +1,141 @@
+<form [formGroup]="form">
+    <div fxLayout="row" class="mat-dialog-title" fxLayoutAlign="start center" mat-dialog-title>
+      <h2 class="headline ml-4" fxFlex="auto">{{tituloForm}}</h2>
+      <button class="text-secondary" mat-dialog-close mat-icon-button type="button" (click)="cerrarVentana(null)"
+        style="color: white;">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+      </button>
+    </div>
+    <mat-divider class="-mx-6 text-border"></mat-divider>
+  
+    <div fxLayout="column" class="margenesForms">
+        <div fxLayout="column">
+            <div class="mt-0 border-b" fxLayout="row" fxLayoutAlign="start center">
+              <span @scaleIn class="w-10 h-4 rounded-full text-primary mr-1 flex items-center justify-center">
+                <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+              </span>
+              <h3 @fadeInRight class="subtitle m-0 block">Información general</h3>
+            </div>
+            <span fxFlex></span>
+        </div>
+
+        <div class="px-2 py-2" fxLayout="column">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                <mat-form-field class="flex-auto">
+                    <mat-label>Nombre</mat-label>
+                    <input matInput maxlength="250" class="uppercase" formControlName="nombre" required>
+                    <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese el nombre del precio específico</mat-hint>
+                    <mat-error *ngIf="form.get('nombre').hasError('required')">Ingrese el nombre del precio específico</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="px-2 py-2" fxLayout="column">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                <div class="flex-auto">
+                    <p class="mt-0 mb-0 text-secondary psize12">Grupo de clientes</p>
+                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="tipoaplicacion">
+                        <mat-radio-button value="1" (click)="validaGrupo(1)">Si</mat-radio-button>
+                        <mat-radio-button value="0" (click)="validaGrupo(0)">No</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <mat-form-field fxFlex="auto" *ngIf="divGrupo">
+                    <mat-label>Grupo</mat-label>
+                    <mat-select formControlName="clientegrupo" required >
+                      <mat-option [value]="0">Seleccione una opcion</mat-option>
+                      <mat-option *ngFor="let option of lstGrupoClientes" [value]="option.idclientegrupo">{{option.nombre}}
+                      </mat-option>
+                    </mat-select>
+                    <mat-hint align="start">Seleccione una opción</mat-hint>
+                    <mat-error *ngIf="form.get('clientegrupo').hasError('required')">Seleccione una opción</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxLayout="column">
+            <div class="mt-0 border-b" fxLayout="row" fxLayoutAlign="start center">
+              <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+                <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+              </span>
+              <h3 @fadeInRight class="subtitle m-0 block">Precio del producto detalle</h3>
+            </div>
+            <span fxFlex></span>
+        </div>
+        <div class="px-2 py-2" fxLayout="column">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                <div class="flex-auto">
+                    <p class="mt-0 mb-0 text-secondary">Temporada</p>
+                    <p class="psize12">¿Este precio es disponible por temporada?</p>
+                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="ilimitado">
+                        <mat-radio-button value="1" (click)="validaTemporada(1)">Si</mat-radio-button>
+                        <mat-radio-button value="0" (click)="validaTemporada(0)">Ilimitado</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <!-- -->
+                <mat-form-field fxFlex="auto" *ngIf="divTemporada">
+                    <mat-label>Fecha de Inicio</mat-label>
+                    <input matInput [matDatepicker]="pickerfechaIni" formControlName="fechainicio" (dateChange)="validaFechas()" 
+                    readonly required>
+                    <mat-datepicker-toggle matSuffix [for]="pickerfechaIni"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerfechaIni></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field fxFlex="auto" *ngIf="divTemporada">
+                    <mat-label>Fecha Fin</mat-label>
+                    <input matInput [matDatepicker]="pickerfechaFin" formControlName="fechafin"
+                        [min]="minFecha" readonly required>
+                    <mat-datepicker-toggle matSuffix [for]="pickerfechaFin"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerfechaFin></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="px-2 py-2" fxLayout="column">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0" >
+                <div class="flex-auto">
+                    <p class="mt-0 mb-0 text-secondary">Disponibilidad</p>
+                    <mat-radio-group fxLayout="row" fxLayoutGap="16px" formControlName="tipocantidad" class="example-radio-group">
+                        <mat-radio-button value="0" class="example-radio-button">Este precio es disponible a partir de</mat-radio-button>
+                        <mat-radio-button value="1" class="example-radio-button">Este precio es igual a </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <mat-form-field fxFlex="auto">
+                    <mat-label>Cantidad</mat-label>
+                    <input formControlName="cantidad" matInput maxlength="5" minlength="1" required
+                    vexDirectivasComercial [entrada]='tipoEntradaNumero'>
+                    <mat-icon [icIcon]="icReceipt" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese una cantidad</mat-hint>
+                    <mat-error *ngIf="form.get('cantidad').hasError('required')">Ingrese una cantidad</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="px-2 py-2" fxLayout="column">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="16px" fxLayoutGap.lt-sm="0">
+                <mat-form-field fxFlex="auto">
+                    <mat-label>Descuento</mat-label>
+                    <input formControlName="descuento" matInput maxlength="5" minlength="1" required
+                    vexDirectivasComercial [entrada]='tipoEntradaMoneda'>
+                    <mat-icon [icIcon]="icReceipt" matPrefix></mat-icon>
+                    <mat-hint align="start">Ingrese una cantidad</mat-hint>
+                    <mat-error *ngIf="form.get('tipodcto').hasError('required')">Ingrese una cantidad</mat-error>
+                </mat-form-field>
+                <mat-form-field fxFlex="auto">
+                    <mat-label>Tipo Dcto.</mat-label>
+                    <mat-select formControlName="tipodcto" required>
+                        <mat-option [value]="1">Descuento en S/.</mat-option>
+                        <mat-option [value]="0">Descuento en %</mat-option>
+                      </mat-select>
+                    <mat-hint align="start">Seleccione una opción</mat-hint>
+                    <mat-error *ngIf="form.get('descuento').hasError('required')">Seleccione una opción</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-4 py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+      <button class="mat-focus-indicator mat-button mat-button-base mat-dialogNO" mat-raised-button type="button"
+        (click)="cerrarVentana(null)">Cancelar
+      </button>
+      <button class="mat-focus-indicator mat-button mat-button-base mat-dialogOk" [disabled]="habilitaBtnReg"
+        [class.spinner]="spinBtnReg" mat-raised-button type="button" (click)="RegistrarPrecioEspecifico()">{{btnRegistro}}
+      </button>
+    </div>
+  </form>
+  

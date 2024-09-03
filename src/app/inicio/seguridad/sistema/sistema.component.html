@@ -1,0 +1,95 @@
+<vex-secondary-toolbar current="{{itemPrincipal}}" *ngIf="accesoFormulario">
+  <vex-breadcrumbs [crumbs]="['Sistema']" class="flex-auto"></vex-breadcrumbs>
+  <button class="ml-2" color="primary" mat-icon-button type="button">
+    <mat-icon [icIcon]="icMoreVert"></mat-icon>
+  </button>
+</vex-secondary-toolbar>
+
+<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" *ngIf="!accesoFormulario" class="py-40">
+
+  <div @fadeInUp fxFlex="auto">
+    <blockquote *ngIf="validandoPermiso" style="margin: 0px; color: #4d4d4d; text-align: center;">
+      Verificando este módulo. Un momento por favor ...
+      <div class="spinner-container" *ngIf="validandoPermiso">
+        <br />
+        <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+        <br />
+      </div>
+    </blockquote>
+    <blockquote *ngIf="!validandoPermiso" style="margin: 0px; color: #4d4d4d; text-align: center;">
+      Ud. no tiene permisos para acceder a este módulo.
+    </blockquote>
+  </div>
+
+</div>
+
+<vex-page-layout *ngIf="accesoFormulario">
+  <vex-page-layout-header class="pb-4" fxLayout="column" fxLayoutAlign="start start"></vex-page-layout-header>
+
+  <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+    [class.px-gutter]="layoutCtrl.value === 'fullwidth'" class="-mt-6">
+
+    <div class="card overflow-auto -mt-16">
+      <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
+        <h2 class="title my-0" fxLayout="row" fxLayoutAlign="start center" fxFlex="none">
+          <span @scaleIn class="w-10 h-10 rounded-full text-primary mr-1 flex items-center justify-center">
+            <ic-icon [icon]="icBubbleChart" height="20px" width="20px"></ic-icon>
+          </span>
+          <span @fadeInRight class="block">Configuración de Sistema</span>
+        </h2>
+      </div>
+
+      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" [formGroup]="form" *ngIf="accesoFormulario">
+        <div class="card" fxFlex="auto">
+
+          <div class="px-6 py-6" fxLayout="column">
+            <mat-form-field>
+              <mat-label>Nombre</mat-label>
+              <input matInput class="uppercase" maxlength="255" formControlName="nombre" required>
+              <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+              <mat-hint align="start">Ingrese el nombre del sistema</mat-hint>
+              <mat-error *ngIf="form.get('nombre').hasError('required')">Ingrese el nombre del sistema</mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Abreviatura</mat-label>
+              <input matInput class="uppercase" maxlength="255" formControlName="abreviatura" required>
+              <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+              <mat-hint align="start">Ingrese una abreviatura del sistema</mat-hint>
+              <mat-error *ngIf="form.get('abreviatura').hasError('required')">Ingrese una abreviatura del sistema
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Versión</mat-label>
+              <input matInput maxlength="255" formControlName="version" required>
+              <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+              <mat-hint align="start">Ingrese una versión del sistema</mat-hint>
+              <mat-error *ngIf="form.get('version').hasError('required')">Ingrese una versión del sistema</mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Enlace</mat-label>
+              <input #lengthHint matInput maxlength="255" formControlName="enlace" required>
+              <mat-icon [icIcon]="icMenu" matPrefix></mat-icon>
+              <mat-hint align="start">Ingrese el enlace del sistema</mat-hint>
+              <mat-hint align="end">{{lengthHint.value.length}}/255</mat-hint>
+              <mat-error align="start" *ngIf="form.get('enlace').hasError('required')">Ingrese el enlace del sistema
+              </mat-error>
+            </mat-form-field>
+
+            <div class="py-6" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+              <!--<button mat-button type="button" (click)="Cancelar()">Cancelar</button>-->
+              <button color="primary" mat-raised-button [disabled]="habilitaBtnReg" [class.spinner]="spinBtnReg"
+                type="button" (click)="RegistrarSistema()">
+                <mat-icon>save</mat-icon>
+                Registrar
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </vex-page-layout-content>
+</vex-page-layout>

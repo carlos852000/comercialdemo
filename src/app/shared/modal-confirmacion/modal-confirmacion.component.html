@@ -1,0 +1,32 @@
+<div class="dialog-content-wrapper">
+    <mat-toolbar matDialogTitle class="mat-accent m-0">
+        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+            <span class="title dialog-title">{{dialogTitle}}</span>
+            <button mat-icon-button (click)="matDialogRef.close()" aria-label="Close dialog">
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-toolbar-row>
+    </mat-toolbar>
+
+    <div mat-dialog-content fusePerfectScrollbar>
+        <div fxLayout="row" fxLayoutAlign="start start" class="p-2">
+            <span [innerHTML]="dialogContent"></span>
+        </div>
+    </div>
+
+    <div mat-dialog-actions  fxLayout="row" >
+        <div fxFlex="100" class="p-1" fxLayout="row" fxLayoutAlign="end center">
+
+            <button mat-raised-button color="primary" class="save-button" aria-label="SAVE"
+                (click)="confirmarSi()">
+                SÍ
+            </button>
+            <button mat-raised-button color="default"
+            (click)="confirmarNo()"
+            class="save-button" aria-label="SAVE">
+                NO
+            </button>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<div fxLayout="row" fxLayoutAlign="start center">
+
+    <mat-toolbar matDialogTitle class="m-0 mat-primary" mat-dialog-title>
+        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+            <span class="title dialog-title">Confirmación</span>
+            <span fxFlex></span>
+            <!--<button class="text-secondary" mat-dialog-close mat-icon-button type="button" (click)="matDialogRef.close()" style="color: white;">
+                <mat-icon [icIcon]="icClose"></mat-icon>
+            </button>-->
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-divider class="-mx-6 text-border"></mat-divider>
+    <mat-dialog-content fxLayout="column">
+        <div class="spinner-container" *ngIf="loading">
+            <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+        </div>
+        <div *ngIf="!loading" fxLayout="row" style="font-size: medium;" fxLayoutAlign="start center">
+            <div [innerHTML]="dialogContent"></div>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogNO" 
+            [disabled]="loading"
+            mat-raised-button type="button" (click)="onNoClick()">NO
+        </button>
+        <button class="mat-focus-indicator mat-button mat-button-base mat-dialogOk" 
+            [disabled]="loading"
+            mat-raised-button type="button" (click)="onButtonSiClicked()">SI
+        </button>
+    </mat-dialog-actions>
+</div>
