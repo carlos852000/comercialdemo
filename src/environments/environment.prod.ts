@@ -2,7 +2,7 @@ export const environment = {
   production: true,
 
   baseURLSist: 'https://siscomercial.netlify.app/',
-  baseURL: 'https://7026-190-187-218-90.ngrok.io/siscomercialback/',
+  baseURL: 'https://7026-190-187-218-90.ngrok.io/siscomercialdemoback/',
 
   VERSION_SIST: '.1.0.0 DEV',
 

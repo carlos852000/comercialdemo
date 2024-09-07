@@ -1,9 +1,9 @@
 export const environment = {
   production: false,
 
-  baseURLSist: 'http://localhost:4200/siscomercial/',
+  baseURLSist: 'http://localhost:4200/siscomercialdemo/',
 
-  baseURL: 'http://localhost:4550/siscomercialback/',
+  baseURL: 'http://localhost:4550/siscomercialdemoback/',
 
   VERSION_SIST: '.1.0.0 DEV',
 
